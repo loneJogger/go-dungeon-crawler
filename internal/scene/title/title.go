@@ -12,5 +12,5 @@ func New() *TitleScene { return &TitleScene{} }
 func (s *TitleScene) Update() error { return nil }
 
 func (s *TitleScene) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, "Explore Scene")
+	ebitenutil.DebugPrint(screen, "Title Scene")
 }
