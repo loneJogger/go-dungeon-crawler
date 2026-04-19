@@ -37,3 +37,7 @@ func (s *ExploreScene) Draw(screen *ebiten.Image) {
 func (s *ExploreScene) TransitionPhase() transition.Phase {
 	return transition.Opening
 }
+
+func (s *ExploreScene) OnEnter() {
+	s.assets.TownBGM.Play()
+}

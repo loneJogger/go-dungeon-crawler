@@ -25,6 +25,9 @@ func (g *Game) SetScene(s scene.Scene) {
 		g.current = s
 		return
 	}
+	if ex, ok := g.current.(scene.SceneExiter); ok {
+		ex.OnExit()
+	}
 	g.pending = s
 	phase := transition.Closing
 	if ts, ok := s.(TransitionStarter); ok {
@@ -43,6 +46,9 @@ func (g *Game) Update() error {
 		}
 		if g.transition.Done {
 			g.transition = nil
+			if en, ok := g.current.(scene.SceneEnter); ok {
+				en.OnEnter()
+			}
 		}
 		return nil // block input during transition
 	}
