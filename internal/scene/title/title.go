@@ -28,18 +28,27 @@ func New(ss scene.SceneSwitcher, a *assets.Assets) *TitleScene {
 		{Label: "Contine", OnSelect: func() { /* TODO */ }},
 		{Label: "Exit", OnSelect: func() { os.Exit(0) }},
 	})
+	a.TitleBGM.Play()
 	return s
 }
 
 func (s *TitleScene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
 		s.menu.MoveUp()
+		s.assets.MenuNav.Rewind()
+		s.assets.MenuNav.Play()
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
 		s.menu.MoveDown()
+		s.assets.MenuNav.Rewind()
+		s.assets.MenuNav.Play()
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
 		s.menu.Select()
+		if s.menu.Focused() == 0 {
+			s.assets.MenuSelect.Rewind()
+			s.assets.MenuSelect.Play()
+		}
 	}
 	return nil
 }

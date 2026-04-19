@@ -1,12 +1,14 @@
 package assets
 
 import (
+	"bytes"
 	"image"
 	_ "image/png"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/lafriks/go-tiled"
 )
@@ -20,10 +22,14 @@ type Assets struct {
 	TownMap     *tiled.Map
 	TownTileset *ebiten.Image
 
+	// sound
 	AudioContext *audio.Context
 	// sfx
 	MenuNav    *audio.Player
 	MenuSelect *audio.Player
+	// bgm
+	TitleBGM *audio.Player
+	TownBGM  *audio.Player
 }
 
 func LoadAssets() (*Assets, error) {
@@ -53,17 +59,27 @@ func LoadAssets() (*Assets, error) {
 		AudioContext: audioContext,
 	}
 
-	menuNav, err := assets.LoadAudio("assets/sfx/menuNav.wav")
+	menuNav, err := assets.LoadSound("assets/sfx/menuNav.wav")
 	if err != nil {
 		return nil, err
 	}
-	menuSelect, err := assets.LoadAudio("assets/sfx/menuSelect.wav")
+	menuSelect, err := assets.LoadSound("assets/sfx/menuSelect.wav")
+	if err != nil {
+		return nil, err
+	}
+	titleBgm, err := assets.LoadBGM("assets/bgMusic/title_theme.ogg")
+	if err != nil {
+		return nil, err
+	}
+	townBgm, err := assets.LoadBGM("assets/bgMusic/town_theme.ogg")
 	if err != nil {
 		return nil, err
 	}
 
 	assets.MenuNav = menuNav
 	assets.MenuSelect = menuSelect
+	assets.TitleBGM = titleBgm
+	assets.TownBGM = townBgm
 
 	return assets, nil
 }
@@ -83,13 +99,12 @@ func LoadImage(path string) (*ebiten.Image, error) {
 	return ebiten.NewImageFromImage(img), nil
 }
 
-func (a *Assets) LoadAudio(path string) (*audio.Player, error) {
-	audioFile, err := os.Open(path)
+func (a *Assets) LoadSound(path string) (*audio.Player, error) {
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	defer audioFile.Close()
-	audioDecoded, err := wav.DecodeWithoutResampling(audioFile)
+	audioDecoded, err := wav.DecodeWithoutResampling(bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
@@ -98,4 +113,21 @@ func (a *Assets) LoadAudio(path string) (*audio.Player, error) {
 		return nil, err
 	}
 	return sound, nil
+}
+
+func (a *Assets) LoadBGM(path string) (*audio.Player, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	bgmDecoded, err := vorbis.DecodeWithoutResampling(bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+	loop := audio.NewInfiniteLoop(bgmDecoded, bgmDecoded.Length())
+	player, err := a.AudioContext.NewPlayer(loop)
+	if err != nil {
+		return nil, err
+	}
+	return player, nil
 }
