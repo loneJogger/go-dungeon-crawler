@@ -6,17 +6,29 @@ import (
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/lafriks/go-tiled"
 )
 
 type Assets struct {
-	DialogBorder *ebiten.Image
-	TownMap      *tiled.Map
-	TownTileset  *ebiten.Image
+	// sprites
 	PCSprite     *ebiten.Image
+	DialogBorder *ebiten.Image
+
+	// tilesets
+	TownMap     *tiled.Map
+	TownTileset *ebiten.Image
+
+	AudioContext *audio.Context
+	// sfx
+	MenuNav    *audio.Player
+	MenuSelect *audio.Player
 }
 
 func LoadAssets() (*Assets, error) {
+	audioContext := audio.NewContext(44100)
+
 	dialogBorder, err := LoadImage("assets/ui/dialog_border.png")
 	if err != nil {
 		return nil, err
@@ -33,12 +45,27 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Assets{
+	assets := &Assets{
 		DialogBorder: dialogBorder,
 		TownMap:      townMap,
 		TownTileset:  townTileset,
 		PCSprite:     pcSprite,
-	}, nil
+		AudioContext: audioContext,
+	}
+
+	menuNav, err := assets.LoadAudio("assets/sfx/menuNav.wav")
+	if err != nil {
+		return nil, err
+	}
+	menuSelect, err := assets.LoadAudio("assets/sfx/menuSelect.wav")
+	if err != nil {
+		return nil, err
+	}
+
+	assets.MenuNav = menuNav
+	assets.MenuSelect = menuSelect
+
+	return assets, nil
 }
 
 func LoadImage(path string) (*ebiten.Image, error) {
@@ -54,4 +81,21 @@ func LoadImage(path string) (*ebiten.Image, error) {
 	}
 
 	return ebiten.NewImageFromImage(img), nil
+}
+
+func (a *Assets) LoadAudio(path string) (*audio.Player, error) {
+	audioFile, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer audioFile.Close()
+	audioDecoded, err := wav.DecodeWithoutResampling(audioFile)
+	if err != nil {
+		return nil, err
+	}
+	sound, err := a.AudioContext.NewPlayer(audioDecoded)
+	if err != nil {
+		return nil, err
+	}
+	return sound, nil
 }
