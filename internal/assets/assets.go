@@ -13,6 +13,7 @@ type Assets struct {
 	DialogBorder *ebiten.Image
 	TownMap      *tiled.Map
 	TownTileset  *ebiten.Image
+	PCSprite     *ebiten.Image
 }
 
 func LoadAssets() (*Assets, error) {
@@ -28,10 +29,15 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
+	pcSprite, err := LoadImage("assets/sprites/red_mage.png")
+	if err != nil {
+		return nil, err
+	}
 	return &Assets{
 		DialogBorder: dialogBorder,
 		TownMap:      townMap,
 		TownTileset:  townTileset,
+		PCSprite:     pcSprite,
 	}, nil
 }
 
