@@ -10,7 +10,7 @@ import (
 
 func main() {
 	g := game.New()
-	g.SetScene(title.New())
+	g.SetScene(title.New(g))
 
 	ebiten.SetWindowSize(640, 480)
 	ebiten.SetWindowTitle("RPG Dungeon Crawler")
