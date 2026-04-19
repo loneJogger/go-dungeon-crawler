@@ -9,15 +9,15 @@ import (
 )
 
 const tileSize = 16
-const speed = 2.0
+const speed = 1.5
 
 type Player struct {
-	X, Y       float64
-	Direction  int
-	Frame      int
-	FacingLeft bool
-	Moving     bool
-	AnimTimer  int
+	X, Y        float64
+	Direction   int
+	Frame       int
+	FacingRight bool
+	Moving      bool
+	AnimTimer   int
 }
 
 func NewPlayer(x, y float64) *Player {
@@ -31,28 +31,28 @@ func (p *Player) Update(m *tiled.Map) {
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
 		ny += speed
 		p.Direction = 0
-		p.FacingLeft = false
+		p.FacingRight = false
 	}
 
 	// walk up
 	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
 		ny -= speed
 		p.Direction = 2
-		p.FacingLeft = false
+		p.FacingRight = false
 	}
 
 	// walk left
 	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
 		nx -= speed
 		p.Direction = 1
-		p.FacingLeft = true
+		p.FacingRight = false
 	}
 
 	// walk right
 	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
 		nx += speed
 		p.Direction = 1
-		p.FacingLeft = false
+		p.FacingRight = true
 	}
 
 	// is moving check
@@ -62,7 +62,22 @@ func (p *Player) Update(m *tiled.Map) {
 		ebiten.IsKeyPressed(ebiten.KeyArrowRight)
 
 	// check for collision
-	if !world.IsSolid(m, nx+8, ny+8) {
+	var checkX, checkY float64 = nx + 8, ny + 8 // default center
+
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+		checkY = ny + tileSize - 1 // bottom edge of sprite
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		checkY = ny + 8 // center — keeps the overhang
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+		checkX = nx
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+		checkX = nx + tileSize - 1
+	}
+
+	if !world.IsSolid(m, checkX, checkY) {
 		p.X, p.Y = nx, ny
 	}
 
@@ -91,7 +106,7 @@ func (p *Player) Draw(screen *ebiten.Image, sprite *ebiten.Image) {
 
 	op := &ebiten.DrawImageOptions{}
 
-	if p.FacingLeft {
+	if p.FacingRight {
 		op.GeoM.Scale(-1, 1)
 		op.GeoM.Translate(tileSize, 0)
 	}
