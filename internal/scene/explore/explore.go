@@ -5,6 +5,7 @@ import (
 	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
+	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 	"github.com/loneJogger/go-dungeon-crawler/internal/world"
 )
 
@@ -31,4 +32,8 @@ func (s *ExploreScene) Update() error {
 func (s *ExploreScene) Draw(screen *ebiten.Image) {
 	world.DrawMap(screen, s.assets.TownMap, s.assets.TownTileset)
 	s.player.Draw(screen, s.assets.PCSprite)
+}
+
+func (s *ExploreScene) TransitionPhase() transition.Phase {
+	return transition.Opening
 }
