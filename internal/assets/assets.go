@@ -6,10 +6,13 @@ import (
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/lafriks/go-tiled"
 )
 
 type Assets struct {
 	DialogBorder *ebiten.Image
+	TownMap      *tiled.Map
+	TownTileset  *ebiten.Image
 }
 
 func LoadAssets() (*Assets, error) {
@@ -17,8 +20,18 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
+	townMap, err := tiled.LoadFile("assets/tiledMaps/ff_town.tmx")
+	if err != nil {
+		return nil, err
+	}
+	townTileset, err := LoadImage("assets/tilesets/ff_town.png")
+	if err != nil {
+		return nil, err
+	}
 	return &Assets{
 		DialogBorder: dialogBorder,
+		TownMap:      townMap,
+		TownTileset:  townTileset,
 	}, nil
 }
 
