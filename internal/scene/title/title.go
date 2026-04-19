@@ -74,3 +74,7 @@ func (s *TitleScene) Draw(screen *ebiten.Image) {
 		ebitenutil.DebugPrintAt(screen, label, menuX, menuY+i*20)
 	}
 }
+
+func (s *TitleScene) OnExit() {
+	s.assets.TitleBGM.Pause()
+}

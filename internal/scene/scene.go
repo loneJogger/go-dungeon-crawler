@@ -10,3 +10,11 @@ type Scene interface {
 type SceneSwitcher interface {
 	SetScene(Scene)
 }
+
+type SceneExiter interface {
+	OnExit()
+}
+
+type SceneEnter interface {
+	OnEnter()
+}
