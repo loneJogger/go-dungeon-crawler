@@ -2,8 +2,10 @@ package entity
 
 import (
 	"image"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/lafriks/go-tiled"
 	"github.com/loneJogger/go-dungeon-crawler/internal/world"
 )
@@ -26,6 +28,11 @@ func NewPlayer(x, y float64) *Player {
 
 func (p *Player) Update(m *tiled.Map) {
 	nx, ny := p.X, p.Y
+
+	// exit (temporary should but this behind a menu eventually)
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		os.Exit(0)
+	}
 
 	// walk down
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {

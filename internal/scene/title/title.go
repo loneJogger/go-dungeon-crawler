@@ -25,7 +25,7 @@ func New(ss scene.SceneSwitcher, a *assets.Assets) *TitleScene {
 	s := &TitleScene{sceneSwitcher: ss, assets: a}
 	s.menu = *ui.NewMenu([]ui.MenuItem{
 		{Label: "New Game", OnSelect: func() { ss.SetScene(explore.New(ss, a)) }},
-		{Label: "Contine", OnSelect: func() { /* TODO */ }},
+		{Label: "Continue", OnSelect: func() { /* TODO */ }},
 		{Label: "Exit", OnSelect: func() { os.Exit(0) }},
 	})
 	a.TitleBGM.Play()
