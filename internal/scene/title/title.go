@@ -5,7 +5,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene/explore"
@@ -24,32 +23,22 @@ type TitleScene struct {
 func New(ss scene.SceneSwitcher, a *assets.Assets) *TitleScene {
 	s := &TitleScene{sceneSwitcher: ss, assets: a}
 	s.menu = *ui.NewMenu([]ui.MenuItem{
-		{Label: "New Game", OnSelect: func() { ss.SetScene(explore.New(ss, a)) }},
-		{Label: "Contine", OnSelect: func() { /* TODO */ }},
+		{Label: "New Game", OnSelect: func() {
+			a.GameStart.Rewind()
+			a.GameStart.Play()
+			ss.SetScene(explore.New(ss, a))
+		}},
+		{Label: "Continue", OnSelect: func() { /* TODO */ }},
 		{Label: "Exit", OnSelect: func() { os.Exit(0) }},
 	})
+	s.menu.NavSound = a.MenuNav
+	s.menu.SelectSound = a.MenuSelect
 	a.TitleBGM.Play()
 	return s
 }
 
 func (s *TitleScene) Update() error {
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-		s.menu.MoveUp()
-		s.assets.MenuNav.Rewind()
-		s.assets.MenuNav.Play()
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
-		s.menu.MoveDown()
-		s.assets.MenuNav.Rewind()
-		s.assets.MenuNav.Play()
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
-		s.menu.Select()
-		if s.menu.Focused() == 0 {
-			s.assets.MenuSelect.Rewind()
-			s.assets.MenuSelect.Play()
-		}
-	}
+	s.menu.Update()
 	return nil
 }
 

@@ -14,11 +14,11 @@ const (
 )
 
 const (
-	cols         = 25
+	cols         = 20
 	rows         = 15
 	tileSize     = 16
 	speed        = 1
-	stepsPerTick = 6
+	stepsPerTick = 3
 )
 
 type SpiralTransition struct {
@@ -113,7 +113,10 @@ func generateSpiralOrder() []int {
 			order = append(order, idx)
 		}
 	}
+	add(cx-1, cy)
 	add(cx, cy)
+	add(cx-1, cy-1)
+	add(cx, cy-1)
 	for r := 1; r < max(cols, rows); r++ {
 		// top
 		for x := cx - r; x <= cx+r; x++ {

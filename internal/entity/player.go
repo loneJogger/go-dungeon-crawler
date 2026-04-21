@@ -2,73 +2,63 @@ package entity
 
 import (
 	"image"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/lafriks/go-tiled"
 	"github.com/loneJogger/go-dungeon-crawler/internal/world"
 )
 
-const tileSize = 16
 const speed = 1.5
 
 type Player struct {
-	X, Y        float64
-	Direction   int
-	Frame       int
-	FacingRight bool
-	Moving      bool
-	AnimTimer   int
+	Sprite
 }
 
-func NewPlayer(x, y float64) *Player {
-	return &Player{X: x, Y: y}
+func NewPlayer(x, y float64, image *ebiten.Image) *Player {
+	return &Player{Sprite: Sprite{X: x, Y: y, Image: image}}
 }
 
-func (p *Player) Update(m *tiled.Map) {
+func (p *Player) Update(m *tiled.Map, npcs []*NPC) {
 	nx, ny := p.X, p.Y
 
-	// walk down
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		os.Exit(0)
+	}
+
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
 		ny += speed
 		p.Direction = 0
 		p.FacingRight = false
 	}
-
-	// walk up
 	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
 		ny -= speed
 		p.Direction = 2
 		p.FacingRight = false
 	}
-
-	// walk left
 	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
 		nx -= speed
 		p.Direction = 1
 		p.FacingRight = false
 	}
-
-	// walk right
 	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
 		nx += speed
 		p.Direction = 1
 		p.FacingRight = true
 	}
 
-	// is moving check
 	p.Moving = ebiten.IsKeyPressed(ebiten.KeyArrowDown) ||
 		ebiten.IsKeyPressed(ebiten.KeyArrowUp) ||
 		ebiten.IsKeyPressed(ebiten.KeyArrowLeft) ||
 		ebiten.IsKeyPressed(ebiten.KeyArrowRight)
 
-	// check for collision
-	var checkX, checkY float64 = nx + 8, ny + 8 // default center
-
+	var checkX, checkY float64 = nx + 8, ny + 8
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-		checkY = ny + tileSize - 1 // bottom edge of sprite
+		checkY = ny + tileSize - 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-		checkY = ny + 8 // center — keeps the overhang
+		checkY = ny + 8
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
 		checkX = nx
@@ -77,40 +67,19 @@ func (p *Player) Update(m *tiled.Map) {
 		checkX = nx + tileSize - 1
 	}
 
-	if !world.IsSolid(m, checkX, checkY) {
+	if !world.IsSolid(m, checkX, checkY) && !npcCollides(nx, ny, npcs) {
 		p.X, p.Y = nx, ny
 	}
 
-	// animation timer
-	if p.Moving {
-		p.AnimTimer++
-		if p.AnimTimer >= 10 {
-			p.AnimTimer = 0
-			if p.Frame == 0 {
-				p.Frame = 1
-			} else {
-				p.Frame = 0
-			}
-		}
-	} else {
-		p.Frame = 0
-		p.AnimTimer = 0
-	}
+	p.TickAnim()
 }
 
-func (p *Player) Draw(screen *ebiten.Image, sprite *ebiten.Image) {
-	sx := p.Frame * tileSize
-	sy := p.Direction * tileSize
-
-	frame := sprite.SubImage(image.Rect(sx, sy, sx+tileSize, sy+tileSize)).(*ebiten.Image)
-
-	op := &ebiten.DrawImageOptions{}
-
-	if p.FacingRight {
-		op.GeoM.Scale(-1, 1)
-		op.GeoM.Translate(tileSize, 0)
+func npcCollides(x, y float64, npcs []*NPC) bool {
+	bounds := image.Rect(int(x), int(y), int(x)+tileSize, int(y)+tileSize)
+	for _, npc := range npcs {
+		if bounds.Overlaps(npc.Bounds()) {
+			return true
+		}
 	}
-
-	op.GeoM.Translate(p.X, p.Y)
-	screen.DrawImage(frame, op)
+	return false
 }
