@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"image"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -19,7 +20,7 @@ func NewPlayer(x, y float64, image *ebiten.Image) *Player {
 	return &Player{Sprite: Sprite{X: x, Y: y, Image: image}}
 }
 
-func (p *Player) Update(m *tiled.Map) {
+func (p *Player) Update(m *tiled.Map, npcs []*NPC) {
 	nx, ny := p.X, p.Y
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
@@ -66,9 +67,19 @@ func (p *Player) Update(m *tiled.Map) {
 		checkX = nx + tileSize - 1
 	}
 
-	if !world.IsSolid(m, checkX, checkY) {
+	if !world.IsSolid(m, checkX, checkY) && !npcCollides(nx, ny, npcs) {
 		p.X, p.Y = nx, ny
 	}
 
 	p.TickAnim()
+}
+
+func npcCollides(x, y float64, npcs []*NPC) bool {
+	bounds := image.Rect(int(x), int(y), int(x)+tileSize, int(y)+tileSize)
+	for _, npc := range npcs {
+		if bounds.Overlaps(npc.Bounds()) {
+			return true
+		}
+	}
+	return false
 }

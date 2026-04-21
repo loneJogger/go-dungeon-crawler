@@ -22,6 +22,8 @@ const bgmInteriorVolume = 0.25
 type Assets struct {
 	// sprites
 	PCSprite     *ebiten.Image
+	NPCThief     *ebiten.Image
+	Font         *ebiten.Image
 	DialogBorder *ebiten.Image
 
 	// tilesets
@@ -58,11 +60,21 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
+	npcThief, err := LoadImage("assets/sprites/thief.png")
+	if err != nil {
+		return nil, err
+	}
+	font, err := LoadImage("assets/ui/8BitFont.png")
+	if err != nil {
+		return nil, err
+	}
 	assets := &Assets{
 		DialogBorder: dialogBorder,
 		TownMap:      townMap,
 		TownTileset:  townTileset,
 		PCSprite:     pcSprite,
+		NPCThief:     npcThief,
+		Font:         font,
 		AudioContext: audioContext,
 	}
 

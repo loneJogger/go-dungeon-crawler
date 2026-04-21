@@ -9,13 +9,13 @@ import (
 )
 
 const (
-	charDelay       = 3
-	charSize        = 16
-	charsPerRow     = 16
-	DialogPadding   = 8
+	charDelay        = 5
+	charSize         = 16
+	charsPerRow      = 16
+	DialogPadding    = 8
 	DialogLineHeight = 20
-	DialogMaxChars  = 19
-	DialogMaxLines  = 4
+	DialogMaxChars   = 19
+	DialogMaxLines   = 4
 )
 
 type TextScroll struct {
@@ -26,12 +26,14 @@ type TextScroll struct {
 	waitingNext bool
 	done        bool
 	OnComplete  func()
+	Color       [4]float32
 }
 
 func NewTextScroll(text string, onComplete func()) *TextScroll {
 	return &TextScroll{
 		pages:      paginate(text),
 		OnComplete: onComplete,
+		Color:      [4]float32{1, 1, 1, 1},
 	}
 }
 
@@ -42,9 +44,16 @@ func (t *TextScroll) Update() {
 
 	if t.waitingNext {
 		if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
-			t.pageIndex++
-			t.charIndex = 0
-			t.waitingNext = false
+			if t.pageIndex < len(t.pages)-1 {
+				t.pageIndex++
+				t.charIndex = 0
+				t.waitingNext = false
+			} else {
+				t.done = true
+				if t.OnComplete != nil {
+					t.OnComplete()
+				}
+			}
 		}
 		return
 	}
@@ -63,13 +72,8 @@ func (t *TextScroll) Update() {
 		currentPage := t.pages[t.pageIndex]
 		if t.charIndex < len(currentPage) {
 			t.charIndex++
-		} else if t.pageIndex < len(t.pages)-1 {
-			t.waitingNext = true
 		} else {
-			t.done = true
-			if t.OnComplete != nil {
-				t.OnComplete()
-			}
+			t.waitingNext = true
 		}
 	}
 }
@@ -93,6 +97,7 @@ func (t *TextScroll) Draw(screen *ebiten.Image, font *ebiten.Image, boxX, boxY i
 		src := font.SubImage(image.Rect(sx, sy, sx+charSize, sy+charSize)).(*ebiten.Image)
 
 		op := &ebiten.DrawImageOptions{}
+		op.ColorScale.Scale(t.Color[0], t.Color[1], t.Color[2], t.Color[3])
 		op.GeoM.Translate(
 			float64(boxX+DialogPadding+col*charSize),
 			float64(boxY+DialogPadding+row*DialogLineHeight),
