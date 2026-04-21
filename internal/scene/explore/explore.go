@@ -7,7 +7,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
+	"github.com/loneJogger/go-dungeon-crawler/internal/game"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
+	"github.com/loneJogger/go-dungeon-crawler/internal/scene/interior"
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
 	"github.com/loneJogger/go-dungeon-crawler/internal/world"
@@ -23,6 +25,8 @@ type ExploreScene struct {
 	player        *entity.Player
 	npcs          []*entity.NPC
 	dialogBox     *ui.DialogBox
+	triggers      []world.Trigger
+	firstEnter    bool
 }
 
 func New(ss scene.SceneSwitcher, a *assets.Assets) *ExploreScene {
@@ -36,8 +40,10 @@ func New(ss scene.SceneSwitcher, a *assets.Assets) *ExploreScene {
 		sceneSwitcher: ss,
 		assets:        a,
 		player:        p,
+		firstEnter:    true,
 		npcs:          []*entity.NPC{thief},
 		dialogBox:     d,
+		triggers:      world.LoadTriggers(a.TownMap),
 	}
 	return s
 }
@@ -52,6 +58,14 @@ func (s *ExploreScene) Update() error {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
 		s.checkInteraction()
+	}
+
+	trigger := world.CheckTrigger(s.triggers, s.player.X+8, s.player.Y+12)
+	if trigger != nil && trigger.Name == "inn_entrance" {
+		s.player.Y = s.player.Y + 16
+		s.player.Direction = 0
+		interiorScene := interior.New(s.sceneSwitcher, s.assets, s, 240, 176)
+		s.sceneSwitcher.SetScene(interiorScene)
 	}
 
 	return nil
@@ -92,6 +106,7 @@ func (s *ExploreScene) triggerInteraction(npc *entity.NPC) {
 			"Hello, traveler!\n\nI wouldn't go into those woods alone.\n\n",
 			nil,
 			[]float32{1, 0.8, 0, 1},
+			s.assets.VoiceOne,
 		)
 	case entity.InteractionBattle:
 		// TODO: trigger battle scene
@@ -111,6 +126,15 @@ func (s *ExploreScene) TransitionPhase() transition.Phase {
 	return transition.Opening
 }
 
+func (s *ExploreScene) TransitionType() game.TransitionType {
+	if s.firstEnter {
+		return game.TransitionSpiral
+	}
+	return game.TransitionBox
+}
+
 func (s *ExploreScene) OnEnter() {
+	s.firstEnter = false
 	s.assets.TownBGM.Play()
+	s.assets.TownBGM.SetVolume(assets.BgmWorldVolume)
 }

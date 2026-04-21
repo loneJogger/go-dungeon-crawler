@@ -5,11 +5,12 @@ import (
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 const (
-	charDelay        = 5
+	charDelay        = 8
 	charSize         = 16
 	charsPerRow      = 16
 	DialogPadding    = 8
@@ -27,6 +28,7 @@ type TextScroll struct {
 	done        bool
 	OnComplete  func()
 	Color       [4]float32
+	BeepSound   *audio.Player
 }
 
 func NewTextScroll(text string, onComplete func()) *TextScroll {
@@ -72,6 +74,10 @@ func (t *TextScroll) Update() {
 		currentPage := t.pages[t.pageIndex]
 		if t.charIndex < len(currentPage) {
 			t.charIndex++
+			if t.BeepSound != nil {
+				t.BeepSound.Rewind()
+				t.BeepSound.Play()
+			}
 		} else {
 			t.waitingNext = true
 		}

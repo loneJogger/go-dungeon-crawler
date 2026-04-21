@@ -16,8 +16,8 @@ import (
 const sfxLoudVolume = 0.9
 const sfxSoftVolume = 0.8
 const bgmTitleVolume = 0.7
-const bgmWorldVolume = 0.5
-const bgmInteriorVolume = 0.25
+const BgmWorldVolume = 0.5
+const BgmInteriorVolume = 0.25
 
 type Assets struct {
 	// sprites
@@ -29,6 +29,8 @@ type Assets struct {
 	// tilesets
 	TownMap     *tiled.Map
 	TownTileset *ebiten.Image
+	CaveMap     *tiled.Map
+	CaveTileset *ebiten.Image
 
 	// sound
 	AudioContext *audio.Context
@@ -36,6 +38,7 @@ type Assets struct {
 	MenuNav    *audio.Player
 	MenuSelect *audio.Player
 	GameStart  *audio.Player
+	VoiceOne   *audio.Player
 	// bgm
 	TitleBGM *audio.Player
 	TownBGM  *audio.Player
@@ -56,6 +59,14 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
+	caveMap, err := tiled.LoadFile("assets/tiledMaps/ff_cave.tmx")
+	if err != nil {
+		return nil, err
+	}
+	caveTileset, err := LoadImage("assets/tilesets/ff_cave.png")
+	if err != nil {
+		return nil, err
+	}
 	pcSprite, err := LoadImage("assets/sprites/red_mage.png")
 	if err != nil {
 		return nil, err
@@ -72,6 +83,8 @@ func LoadAssets() (*Assets, error) {
 		DialogBorder: dialogBorder,
 		TownMap:      townMap,
 		TownTileset:  townTileset,
+		CaveMap:      caveMap,
+		CaveTileset:  caveTileset,
 		PCSprite:     pcSprite,
 		NPCThief:     npcThief,
 		Font:         font,
@@ -93,6 +106,11 @@ func LoadAssets() (*Assets, error) {
 		return nil, err
 	}
 	gameStart.SetVolume(sfxLoudVolume)
+	voiceOne, err := assets.LoadSound("assets/sfx/voice1.wav")
+	if err != nil {
+		return nil, err
+	}
+	voiceOne.SetVolume(BgmWorldVolume)
 	titleBgm, err := assets.LoadBGM("assets/bgMusic/title_theme.ogg")
 	if err != nil {
 		return nil, err
@@ -102,11 +120,12 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
-	townBgm.SetVolume(bgmWorldVolume)
+	townBgm.SetVolume(BgmWorldVolume)
 
 	assets.MenuNav = menuNav
 	assets.MenuSelect = menuSelect
 	assets.GameStart = gameStart
+	assets.VoiceOne = voiceOne
 	assets.TitleBGM = titleBgm
 	assets.TownBGM = townBgm
 

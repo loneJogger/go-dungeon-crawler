@@ -6,14 +6,22 @@ import (
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 )
 
-type Game struct {
-	current    scene.Scene
-	pending    scene.Scene
-	transition *transition.SpiralTransition
-}
+type TransitionType int
+
+const (
+	TransitionSpiral TransitionType = iota
+	TransitionBox
+)
 
 type TransitionStarter interface {
 	TransitionPhase() transition.Phase
+	TransitionType() TransitionType
+}
+
+type Game struct {
+	current    scene.Scene
+	pending    scene.Scene
+	transition transition.Transition
 }
 
 func New() *Game {
@@ -25,32 +33,43 @@ func (g *Game) SetScene(s scene.Scene) {
 		g.current = s
 		return
 	}
+	if g.transition != nil {
+		return
+	}
 	if ex, ok := g.current.(scene.SceneExiter); ok {
 		ex.OnExit()
 	}
 	g.pending = s
+
 	phase := transition.Closing
+	tType := TransitionSpiral
 	if ts, ok := s.(TransitionStarter); ok {
 		phase = ts.TransitionPhase()
+		tType = ts.TransitionType()
 	}
-	g.transition = transition.New(phase)
+
+	switch tType {
+	case TransitionBox:
+		g.transition = transition.NewBox(phase)
+	default:
+		g.transition = transition.New(phase)
+	}
 }
 
 func (g *Game) Update() error {
 	if g.transition != nil {
 		g.transition.Update()
-		// when fully black, swap the scene
 		if g.transition.IsFullyBlack() && g.pending != nil {
 			g.current = g.pending
 			g.pending = nil
 		}
-		if g.transition.Done {
+		if g.transition.IsDone() {
 			g.transition = nil
 			if en, ok := g.current.(scene.SceneEnter); ok {
 				en.OnEnter()
 			}
 		}
-		return nil // block input during transition
+		return nil
 	}
 	return g.current.Update()
 }

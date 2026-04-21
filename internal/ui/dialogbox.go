@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
 const (
@@ -36,10 +37,18 @@ func NewDialogBox(font *ebiten.Image, border *ebiten.Image) *DialogBox {
 	return &DialogBox{font: font, border: border, bg: bg}
 }
 
-func (d *DialogBox) ShowText(text string, onComplete func(), color []float32) {
+func (d *DialogBox) ShowText(
+	text string,
+	onComplete func(),
+	color []float32,
+	beep *audio.Player,
+) {
 	t := NewTextScroll(text, onComplete)
 	if len(color) == 4 {
 		t.Color = [4]float32{color[0], color[1], color[2], color[3]}
+	}
+	if beep != nil {
+		t.BeepSound = beep
 	}
 	d.textScroll = t
 	d.mode = DialogModeText
