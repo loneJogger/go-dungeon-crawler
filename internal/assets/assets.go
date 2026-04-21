@@ -36,6 +36,7 @@ type Assets struct {
 	MenuNav    *audio.Player
 	MenuSelect *audio.Player
 	GameStart  *audio.Player
+	VoiceOne   *audio.Player
 	// bgm
 	TitleBGM *audio.Player
 	TownBGM  *audio.Player
@@ -93,6 +94,11 @@ func LoadAssets() (*Assets, error) {
 		return nil, err
 	}
 	gameStart.SetVolume(sfxLoudVolume)
+	voiceOne, err := assets.LoadSound("assets/sfx/voice1.wav")
+	if err != nil {
+		return nil, err
+	}
+	voiceOne.SetVolume(bgmWorldVolume)
 	titleBgm, err := assets.LoadBGM("assets/bgMusic/title_theme.ogg")
 	if err != nil {
 		return nil, err
@@ -107,6 +113,7 @@ func LoadAssets() (*Assets, error) {
 	assets.MenuNav = menuNav
 	assets.MenuSelect = menuSelect
 	assets.GameStart = gameStart
+	assets.VoiceOne = voiceOne
 	assets.TitleBGM = titleBgm
 	assets.TownBGM = townBgm
 

@@ -92,6 +92,7 @@ func (s *ExploreScene) triggerInteraction(npc *entity.NPC) {
 			"Hello, traveler!\n\nI wouldn't go into those woods alone.\n\n",
 			nil,
 			[]float32{1, 0.8, 0, 1},
+			s.assets.VoiceOne,
 		)
 	case entity.InteractionBattle:
 		// TODO: trigger battle scene
