@@ -19,6 +19,8 @@ const startX = 96
 const startY = 200
 const tileSize = 16
 
+var pink = []float32{0.98, 0.653, 0.724, 1}
+
 type ExploreScene struct {
 	sceneSwitcher scene.SceneSwitcher
 	assets        *assets.Assets
@@ -103,9 +105,9 @@ func (s *ExploreScene) triggerInteraction(npc *entity.NPC) {
 	switch npc.Interaction {
 	case entity.InteractionDialog:
 		s.dialogBox.ShowText(
-			"Hello, traveler!\n\nI wouldn't go into those woods alone.\n\n",
+			"Hey You!\n\nThere are some strange characters at the inn...\n\nuh...\nMaybe go do something about it?",
 			nil,
-			[]float32{1, 0.8, 0, 1},
+			pink,
 			s.assets.VoiceOne,
 		)
 	case entity.InteractionBattle:
@@ -137,4 +139,9 @@ func (s *ExploreScene) OnEnter() {
 	s.firstEnter = false
 	s.assets.TownBGM.Play()
 	s.assets.TownBGM.SetVolume(assets.BgmWorldVolume)
+}
+
+func (s *ExploreScene) SetPlayerPos(x, y float64) {
+	s.player.X = x
+	s.player.Y = y
 }
