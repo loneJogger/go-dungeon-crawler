@@ -12,8 +12,16 @@ import (
 
 const speed = 1.5
 
+const (
+	collideLeft   = 2
+	collideRight  = 13
+	collideTop    = 10
+	collideBottom = 15
+)
+
 type Player struct {
 	Sprite
+	dirStack []ebiten.Key
 }
 
 func NewPlayer(x, y float64, image *ebiten.Image) *Player {
@@ -21,57 +29,72 @@ func NewPlayer(x, y float64, image *ebiten.Image) *Player {
 }
 
 func (p *Player) Update(m *tiled.Map, npcs []*NPC) {
-	nx, ny := p.X, p.Y
-
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		os.Exit(0)
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-		ny += speed
-		p.Direction = 0
-		p.FacingRight = false
+	// push newly pressed direction keys onto stack
+	for _, k := range []ebiten.Key{ebiten.KeyArrowDown, ebiten.KeyArrowUp, ebiten.KeyArrowLeft, ebiten.KeyArrowRight} {
+		if inpututil.IsKeyJustPressed(k) {
+			p.dirStack = append(p.dirStack, k)
+		}
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-		ny -= speed
-		p.Direction = 2
-		p.FacingRight = false
+	// remove released keys from stack
+	held := p.dirStack[:0]
+	for _, k := range p.dirStack {
+		if ebiten.IsKeyPressed(k) {
+			held = append(held, k)
+		}
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
-		nx -= speed
-		p.Direction = 1
-		p.FacingRight = false
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
-		nx += speed
-		p.Direction = 1
-		p.FacingRight = true
-	}
+	p.dirStack = held
 
-	p.Moving = ebiten.IsKeyPressed(ebiten.KeyArrowDown) ||
-		ebiten.IsKeyPressed(ebiten.KeyArrowUp) ||
-		ebiten.IsKeyPressed(ebiten.KeyArrowLeft) ||
-		ebiten.IsKeyPressed(ebiten.KeyArrowRight)
+	nx, ny := p.X, p.Y
+	p.Moving = len(p.dirStack) > 0
 
-	var checkX, checkY float64 = nx + 8, ny + 8
-	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-		checkY = ny + tileSize - 1
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-		checkY = ny + 8
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
-		checkX = nx
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
-		checkX = nx + tileSize - 1
-	}
+	if p.Moving {
+		switch p.dirStack[len(p.dirStack)-1] {
+		case ebiten.KeyArrowDown:
+			ny += speed
+			p.Direction = 0
+			p.FacingRight = false
+		case ebiten.KeyArrowUp:
+			ny -= speed
+			p.Direction = 2
+			p.FacingRight = false
+		case ebiten.KeyArrowLeft:
+			nx -= speed
+			p.Direction = 1
+			p.FacingRight = false
+		case ebiten.KeyArrowRight:
+			nx += speed
+			p.Direction = 1
+			p.FacingRight = true
+		}
 
-	if !world.IsSolid(m, checkX, checkY) && !npcCollides(nx, ny, npcs) {
-		p.X, p.Y = nx, ny
+		if !isSolidAt(m, nx, ny) && !npcCollides(nx, ny, npcs) {
+			p.X, p.Y = nx, ny
+		}
 	}
 
 	p.TickAnim()
+}
+
+func isSolidAt(m *tiled.Map, nx, ny float64) bool {
+	switch {
+	case ebiten.IsKeyPressed(ebiten.KeyArrowDown):
+		return world.IsSolid(m, nx+collideLeft, ny+collideBottom) ||
+			world.IsSolid(m, nx+collideRight, ny+collideBottom)
+	case ebiten.IsKeyPressed(ebiten.KeyArrowUp):
+		return world.IsSolid(m, nx+collideLeft, ny+collideTop) ||
+			world.IsSolid(m, nx+collideRight, ny+collideTop)
+	case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
+		return world.IsSolid(m, nx+collideLeft, ny+collideTop) ||
+			world.IsSolid(m, nx+collideLeft, ny+collideBottom)
+	case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
+		return world.IsSolid(m, nx+collideRight, ny+collideTop) ||
+			world.IsSolid(m, nx+collideRight, ny+collideBottom)
+	}
+	return false
 }
 
 func npcCollides(x, y float64, npcs []*NPC) bool {

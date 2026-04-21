@@ -13,6 +13,13 @@ const (
 	Opening
 )
 
+type Transition interface {
+	Update()
+	Draw(screen *ebiten.Image)
+	IsFullyBlack() bool
+	IsDone() bool
+}
+
 const (
 	cols         = 20
 	rows         = 15
@@ -98,6 +105,8 @@ func (t *SpiralTransition) Draw(screen *ebiten.Image) {
 func (t *SpiralTransition) IsFullyBlack() bool {
 	return t.phase == Opening
 }
+
+func (t *SpiralTransition) IsDone() bool { return t.Done }
 
 func generateSpiralOrder() []int {
 	order := make([]int, 0, cols*rows)
