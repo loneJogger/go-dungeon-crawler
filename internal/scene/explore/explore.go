@@ -19,7 +19,7 @@ type ExploreScene struct {
 }
 
 func New(ss scene.SceneSwitcher, a *assets.Assets) *ExploreScene {
-	p := entity.NewPlayer(startX, startY)
+	p := entity.NewPlayer(startX, startY, a.PCSprite)
 	s := &ExploreScene{sceneSwitcher: ss, assets: a, player: p}
 	return s
 }
@@ -31,7 +31,7 @@ func (s *ExploreScene) Update() error {
 
 func (s *ExploreScene) Draw(screen *ebiten.Image) {
 	world.DrawMap(screen, s.assets.TownMap, s.assets.TownTileset)
-	s.player.Draw(screen, s.assets.PCSprite)
+	s.player.Draw(screen)
 }
 
 func (s *ExploreScene) TransitionPhase() transition.Phase {

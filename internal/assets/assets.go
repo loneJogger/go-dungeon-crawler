@@ -13,6 +13,12 @@ import (
 	"github.com/lafriks/go-tiled"
 )
 
+const sfxLoudVolume = 0.9
+const sfxSoftVolume = 0.8
+const bgmTitleVolume = 0.7
+const bgmWorldVolume = 0.5
+const bgmInteriorVolume = 0.25
+
 type Assets struct {
 	// sprites
 	PCSprite     *ebiten.Image
@@ -27,6 +33,7 @@ type Assets struct {
 	// sfx
 	MenuNav    *audio.Player
 	MenuSelect *audio.Player
+	GameStart  *audio.Player
 	// bgm
 	TitleBGM *audio.Player
 	TownBGM  *audio.Player
@@ -63,21 +70,31 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
+	menuNav.SetVolume(sfxSoftVolume)
 	menuSelect, err := assets.LoadSound("assets/sfx/menuSelect.wav")
 	if err != nil {
 		return nil, err
 	}
+	menuSelect.SetVolume(sfxSoftVolume)
+	gameStart, err := assets.LoadSound("assets/sfx/gameStart.wav")
+	if err != nil {
+		return nil, err
+	}
+	gameStart.SetVolume(sfxLoudVolume)
 	titleBgm, err := assets.LoadBGM("assets/bgMusic/title_theme.ogg")
 	if err != nil {
 		return nil, err
 	}
+	titleBgm.SetVolume(bgmTitleVolume)
 	townBgm, err := assets.LoadBGM("assets/bgMusic/town_theme.ogg")
 	if err != nil {
 		return nil, err
 	}
+	townBgm.SetVolume(bgmWorldVolume)
 
 	assets.MenuNav = menuNav
 	assets.MenuSelect = menuSelect
+	assets.GameStart = gameStart
 	assets.TitleBGM = titleBgm
 	assets.TownBGM = townBgm
 
@@ -108,11 +125,11 @@ func (a *Assets) LoadSound(path string) (*audio.Player, error) {
 	if err != nil {
 		return nil, err
 	}
-	sound, err := a.AudioContext.NewPlayer(audioDecoded)
+	player, err := a.AudioContext.NewPlayer(audioDecoded)
 	if err != nil {
 		return nil, err
 	}
-	return sound, nil
+	return player, nil
 }
 
 func (a *Assets) LoadBGM(path string) (*audio.Player, error) {
