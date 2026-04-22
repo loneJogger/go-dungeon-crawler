@@ -7,17 +7,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/lafriks/go-tiled"
-	"github.com/loneJogger/go-dungeon-crawler/internal/world"
 )
 
 const speed = 1.5
-
-const (
-	collideLeft   = 2
-	collideRight  = 13
-	collideTop    = 10
-	collideBottom = 15
-)
 
 type Player struct {
 	Sprite
@@ -71,7 +63,7 @@ func (p *Player) Update(m *tiled.Map, npcs []*NPC) {
 			p.FacingRight = true
 		}
 
-		if !isSolidAt(m, nx, ny) && !npcCollides(nx, ny, npcs) {
+		if !p.OutOfBounds(m, nx, ny) && !p.IsSolidAt(m, nx, ny) && !npcCollides(nx, ny, npcs) {
 			p.X, p.Y = nx, ny
 		}
 	}
@@ -79,23 +71,6 @@ func (p *Player) Update(m *tiled.Map, npcs []*NPC) {
 	p.TickAnim()
 }
 
-func isSolidAt(m *tiled.Map, nx, ny float64) bool {
-	switch {
-	case ebiten.IsKeyPressed(ebiten.KeyArrowDown):
-		return world.IsSolid(m, nx+collideLeft, ny+collideBottom) ||
-			world.IsSolid(m, nx+collideRight, ny+collideBottom)
-	case ebiten.IsKeyPressed(ebiten.KeyArrowUp):
-		return world.IsSolid(m, nx+collideLeft, ny+collideTop) ||
-			world.IsSolid(m, nx+collideRight, ny+collideTop)
-	case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-		return world.IsSolid(m, nx+collideLeft, ny+collideTop) ||
-			world.IsSolid(m, nx+collideLeft, ny+collideBottom)
-	case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-		return world.IsSolid(m, nx+collideRight, ny+collideTop) ||
-			world.IsSolid(m, nx+collideRight, ny+collideBottom)
-	}
-	return false
-}
 
 func npcCollides(x, y float64, npcs []*NPC) bool {
 	bounds := image.Rect(int(x), int(y), int(x)+tileSize, int(y)+tileSize)
