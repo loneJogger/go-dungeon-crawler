@@ -61,6 +61,10 @@ func (s *Location) Update() error {
 
 	s.player.Update(s.tileMap, s.npcs)
 
+	for _, npc := range s.npcs {
+		npc.Update(s.tileMap)
+	}
+
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
 		s.checkInteraction()
 	}

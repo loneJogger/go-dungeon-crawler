@@ -9,6 +9,8 @@ import (
 )
 
 const tileSize = 16
+const screenW = 320
+const screenH = 240
 
 const (
 	collideLeft   = 2
@@ -42,6 +44,10 @@ func (s *Sprite) TickAnim() {
 		s.Frame = 0
 		s.AnimTimer = 0
 	}
+}
+
+func (s *Sprite) OutOfBounds(nx, ny float64) bool {
+	return nx < 0 || nx > screenW-tileSize || ny < 0 || ny > screenH-tileSize
 }
 
 func (s *Sprite) IsSolidAt(m *tiled.Map, nx, ny float64) bool {

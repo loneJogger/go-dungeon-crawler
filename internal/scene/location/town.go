@@ -21,6 +21,7 @@ func NewTown(ss scene.SceneSwitcher, a *assets.Assets) *Town {
 
 	thief := entity.NewNPC(128, 160, 0)
 	thief.Image = a.NPCThief
+	thief.Wanders = true
 
 	t := &Town{firstEnter: true}
 

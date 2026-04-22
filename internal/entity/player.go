@@ -63,7 +63,7 @@ func (p *Player) Update(m *tiled.Map, npcs []*NPC) {
 			p.FacingRight = true
 		}
 
-		if !p.IsSolidAt(m, nx, ny) && !npcCollides(nx, ny, npcs) {
+		if !p.OutOfBounds(nx, ny) && !p.IsSolidAt(m, nx, ny) && !npcCollides(nx, ny, npcs) {
 			p.X, p.Y = nx, ny
 		}
 	}
