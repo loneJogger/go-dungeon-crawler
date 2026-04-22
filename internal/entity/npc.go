@@ -63,7 +63,7 @@ func (n *NPC) Update(m *tiled.Map) {
 	}
 
 	nx, ny := n.X+dx, n.Y+dy
-	if !n.OutOfBounds(nx, ny) && !n.IsSolidAt(m, nx, ny) {
+	if !n.OutOfBounds(m, nx, ny) && !n.IsSolidAt(m, nx, ny) {
 		n.X, n.Y = nx, ny
 		n.Moving = true
 	} else {

@@ -9,34 +9,34 @@ import (
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 )
 
-type Inn struct {
+type Shop struct {
 	Location
 }
 
-func NewInn(ss scene.SceneSwitcher, a *assets.Assets, returnScene scene.Scene, startX, startY float64, exits []scene.ExitConfig) *Inn {
+func NewShop(ss scene.SceneSwitcher, a *assets.Assets, returnScene scene.Scene, startX, startY float64, exits []scene.ExitConfig) *Shop {
 	p := entity.NewPlayer(startX, startY, a.PCSprite)
 	p.Direction = 2
 
-	i := &Inn{}
-	i.Location = *NewLocation(ss, a, p, nil, a.CaveMap, []*ebiten.Image{a.CaveTileset}, nil)
-	i.returnScene = returnScene
-	i.exits = exits
+	sh := &Shop{}
+	sh.Location = *NewLocation(ss, a, p, nil, a.ShopMap, []*ebiten.Image{a.CaveTileset, a.TownTileset}, nil)
+	sh.returnScene = returnScene
+	sh.exits = exits
 
-	return i
+	return sh
 }
 
-func (s *Inn) TransitionPhase() transition.Phase {
+func (s *Shop) TransitionPhase() transition.Phase {
 	return transition.Opening
 }
 
-func (s *Inn) TransitionType() game.TransitionType {
+func (s *Shop) TransitionType() game.TransitionType {
 	return game.TransitionBox
 }
 
-func (s *Inn) OnEnter() {
+func (s *Shop) OnEnter() {
 	s.assets.TownBGM.SetVolume(assets.BgmInteriorVolume)
 }
 
-func (s *Inn) OnExit() {
+func (s *Shop) OnExit() {
 	s.assets.TownBGM.SetVolume(assets.BgmWorldVolume)
 }

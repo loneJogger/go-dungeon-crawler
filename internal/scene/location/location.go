@@ -14,8 +14,11 @@ import (
 )
 
 const TileSize = 16
+const screenW = 320
+const screenH = 240
 
 var PinkText = []float32{0.98, 0.653, 0.724, 1}
+var MintText = []float32{0.641, 0.949, 0.678, 1}
 
 type TriggerHandler func(name string)
 
@@ -27,8 +30,12 @@ type Location struct {
 	dialogBox     *ui.DialogBox
 	triggers      []world.Trigger
 	tileMap       *tiled.Map
-	tileset       *ebiten.Image
+	tilesets      []*ebiten.Image
 	onTrigger     TriggerHandler
+	returnScene   scene.Scene
+	exits         []scene.ExitConfig
+	cameraX       float64
+	cameraY       float64
 }
 
 func NewLocation(
@@ -37,10 +44,10 @@ func NewLocation(
 	p *entity.Player,
 	npcs []*entity.NPC,
 	tm *tiled.Map,
-	ts *ebiten.Image,
+	tilesets []*ebiten.Image,
 	onTrigger TriggerHandler,
 ) *Location {
-	return &Location{
+	l := &Location{
 		sceneSwitcher: ss,
 		assets:        a,
 		player:        p,
@@ -48,9 +55,33 @@ func NewLocation(
 		dialogBox:     ui.NewDialogBox(a.Font, a.DialogBorder),
 		triggers:      world.LoadTriggers(tm),
 		tileMap:       tm,
-		tileset:       ts,
+		tilesets:      tilesets,
 		onTrigger:     onTrigger,
 	}
+	l.updateCamera()
+	return l
+}
+
+func (s *Location) updateCamera() {
+	mapW := float64(s.tileMap.Width * s.tileMap.TileWidth)
+	mapH := float64(s.tileMap.Height * s.tileMap.TileHeight)
+
+	cx := s.player.X - screenW/2 + TileSize/2
+	cy := s.player.Y - screenH/2 + TileSize/2
+
+	if cx < 0 {
+		cx = 0
+	} else if cx > mapW-screenW {
+		cx = mapW - screenW
+	}
+	if cy < 0 {
+		cy = 0
+	} else if cy > mapH-screenH {
+		cy = mapH - screenH
+	}
+
+	s.cameraX = cx
+	s.cameraY = cy
 }
 
 func (s *Location) Update() error {
@@ -65,23 +96,38 @@ func (s *Location) Update() error {
 		npc.Update(s.tileMap)
 	}
 
+	s.updateCamera()
+
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
 		s.checkInteraction()
 	}
 
 	trigger := world.CheckTrigger(s.triggers, s.player.X+8, s.player.Y+12)
-	if trigger != nil && s.onTrigger != nil {
-		s.onTrigger(trigger.Name)
+	if trigger != nil {
+		for _, exit := range s.exits {
+			if trigger.Name == exit.TriggerName {
+				if pp, ok := s.returnScene.(scene.PlayerPositioner); ok {
+					pp.SetPlayerPos(exit.ReturnX, exit.ReturnY)
+				}
+				s.sceneSwitcher.SetScene(s.returnScene)
+				return nil
+			}
+		}
+		if s.onTrigger != nil {
+			s.onTrigger(trigger.Name)
+		}
 	}
 
 	return nil
 }
 
 func (s *Location) Draw(screen *ebiten.Image) {
-	world.DrawMap(screen, s.tileMap, s.tileset)
+	world.DrawMap(screen, s.tileMap, s.tilesets, s.cameraX, s.cameraY)
 	for _, npc := range s.npcs {
+		npc.OffsetX, npc.OffsetY = s.cameraX, s.cameraY
 		npc.Draw(screen)
 	}
+	s.player.OffsetX, s.player.OffsetY = s.cameraX, s.cameraY
 	s.player.Draw(screen)
 	s.dialogBox.Draw(screen)
 }

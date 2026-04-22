@@ -23,6 +23,7 @@ type Assets struct {
 	// sprites
 	PCSprite     *ebiten.Image
 	NPCThief     *ebiten.Image
+	NPCBlackBelt *ebiten.Image
 	Font         *ebiten.Image
 	DialogBorder *ebiten.Image
 
@@ -31,6 +32,7 @@ type Assets struct {
 	TownTileset *ebiten.Image
 	CaveMap     *tiled.Map
 	CaveTileset *ebiten.Image
+	ShopMap     *tiled.Map
 
 	// sound
 	AudioContext *audio.Context
@@ -39,6 +41,7 @@ type Assets struct {
 	MenuSelect *audio.Player
 	GameStart  *audio.Player
 	VoiceOne   *audio.Player
+	VoiceTwo   *audio.Player
 	// bgm
 	TitleBGM *audio.Player
 	TownBGM  *audio.Player
@@ -63,6 +66,10 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
+	shopMap, err := tiled.LoadFile("assets/tiledMaps/shop.tmx")
+	if err != nil {
+		return nil, err
+	}
 	caveTileset, err := LoadImage("assets/tilesets/ff_cave.png")
 	if err != nil {
 		return nil, err
@@ -75,6 +82,10 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
+	npcBlackBelt, err := LoadImage("assets/sprites/black_belt.png")
+	if err != nil {
+		return nil, err
+	}
 	font, err := LoadImage("assets/ui/8BitFont.png")
 	if err != nil {
 		return nil, err
@@ -84,9 +95,11 @@ func LoadAssets() (*Assets, error) {
 		TownMap:      townMap,
 		TownTileset:  townTileset,
 		CaveMap:      caveMap,
+		ShopMap:      shopMap,
 		CaveTileset:  caveTileset,
 		PCSprite:     pcSprite,
 		NPCThief:     npcThief,
+		NPCBlackBelt: npcBlackBelt,
 		Font:         font,
 		AudioContext: audioContext,
 	}
@@ -111,6 +124,11 @@ func LoadAssets() (*Assets, error) {
 		return nil, err
 	}
 	voiceOne.SetVolume(BgmWorldVolume)
+	voiceTwo, err := assets.LoadSound("assets/sfx/voice2.wav")
+	if err != nil {
+		return nil, err
+	}
+	voiceTwo.SetVolume(BgmWorldVolume)
 	titleBgm, err := assets.LoadBGM("assets/bgMusic/title_theme.ogg")
 	if err != nil {
 		return nil, err
@@ -126,6 +144,7 @@ func LoadAssets() (*Assets, error) {
 	assets.MenuSelect = menuSelect
 	assets.GameStart = gameStart
 	assets.VoiceOne = voiceOne
+	assets.VoiceTwo = voiceTwo
 	assets.TitleBGM = titleBgm
 	assets.TownBGM = townBgm
 

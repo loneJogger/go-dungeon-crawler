@@ -40,6 +40,6 @@
 </data>
  </layer>
  <objectgroup id="3" name="triggers">
-  <object id="2" name="exit" x="241.045" y="202.612" width="13.806" height="10.0746"/>
+  <object id="2" name="inn_exit" x="241.045" y="202.612" width="13.806" height="10.0746"/>
  </objectgroup>
 </map>

@@ -9,8 +9,6 @@ import (
 )
 
 const tileSize = 16
-const screenW = 320
-const screenH = 240
 
 const (
 	collideLeft   = 2
@@ -21,6 +19,8 @@ const (
 
 type Sprite struct {
 	X, Y        float64
+	OffsetX     float64
+	OffsetY     float64
 	Direction   int
 	Frame       int
 	FacingRight bool
@@ -46,8 +46,10 @@ func (s *Sprite) TickAnim() {
 	}
 }
 
-func (s *Sprite) OutOfBounds(nx, ny float64) bool {
-	return nx < 0 || nx > screenW-tileSize || ny < 0 || ny > screenH-tileSize
+func (s *Sprite) OutOfBounds(m *tiled.Map, nx, ny float64) bool {
+	mapW := float64(m.Width * m.TileWidth)
+	mapH := float64(m.Height * m.TileHeight)
+	return nx < 0 || nx > mapW-tileSize || ny < 0 || ny > mapH-tileSize
 }
 
 func (s *Sprite) IsSolidAt(m *tiled.Map, nx, ny float64) bool {
@@ -80,6 +82,6 @@ func (s *Sprite) Draw(screen *ebiten.Image) {
 		op.GeoM.Scale(-1, 1)
 		op.GeoM.Translate(float64(tileSize), 0)
 	}
-	op.GeoM.Translate(s.X, s.Y)
+	op.GeoM.Translate(s.X-s.OffsetX, s.Y-s.OffsetY)
 	screen.DrawImage(frame, op)
 }
