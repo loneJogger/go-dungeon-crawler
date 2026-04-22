@@ -7,7 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
-	"github.com/loneJogger/go-dungeon-crawler/internal/scene/explore"
+	"github.com/loneJogger/go-dungeon-crawler/internal/scene/location"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
 )
 
@@ -26,7 +26,7 @@ func New(ss scene.SceneSwitcher, a *assets.Assets) *TitleScene {
 		{Label: "New Game", OnSelect: func() {
 			a.GameStart.Rewind()
 			a.GameStart.Play()
-			ss.SetScene(explore.New(ss, a))
+			ss.SetScene(location.NewTown(ss, a))
 		}},
 		{Label: "Continue", OnSelect: func() { /* TODO */ }},
 		{Label: "Exit", OnSelect: func() { os.Exit(0) }},

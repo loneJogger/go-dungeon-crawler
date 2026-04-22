@@ -1,20 +1,12 @@
 package entity
 
-type InteractionType int
-
-const (
-	InteractionDialog InteractionType = iota
-	InteractionBattle
-)
-
 type NPC struct {
 	Sprite
-	Interaction InteractionType
+	OnInteract func()
 }
 
-func NewNPC(x, y float64, direction int, interaction InteractionType) *NPC {
+func NewNPC(x, y float64, direction int) *NPC {
 	return &NPC{
-		Sprite:      Sprite{X: x, Y: y, Direction: direction},
-		Interaction: interaction,
+		Sprite: Sprite{X: x, Y: y, Direction: direction},
 	}
 }
