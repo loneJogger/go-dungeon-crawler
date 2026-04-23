@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"image"
 	"math/rand"
 
 	"github.com/lafriks/go-tiled"
@@ -24,7 +25,7 @@ func NewNPC(x, y float64, direction int) *NPC {
 	}
 }
 
-func (n *NPC) Update(m *tiled.Map) {
+func (n *NPC) Update(m *tiled.Map, player *Player) {
 	if !n.Wanders {
 		return
 	}
@@ -63,7 +64,8 @@ func (n *NPC) Update(m *tiled.Map) {
 	}
 
 	nx, ny := n.X+dx, n.Y+dy
-	if !n.OutOfBounds(m, nx, ny) && !n.IsSolidAt(m, nx, ny) {
+	nBounds := image.Rect(int(nx), int(ny), int(nx)+tileSize, int(ny)+tileSize)
+	if !n.OutOfBounds(m, nx, ny) && !n.IsSolidAt(m, nx, ny) && !nBounds.Overlaps(player.Bounds()) {
 		n.X, n.Y = nx, ny
 		n.Moving = true
 	} else {
