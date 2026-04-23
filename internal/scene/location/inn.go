@@ -17,8 +17,22 @@ func NewInn(ss scene.SceneSwitcher, a *assets.Assets, returnScene scene.Scene, s
 	p := entity.NewPlayer(startX, startY, a.PCSprite)
 	p.Direction = 2
 
+	devil := entity.NewNPC(128, 64, 0)
+	devil.Image = a.NPCDevil
+	devil.Wanders = true
+
 	i := &Inn{}
-	i.Location = *NewLocation(ss, a, p, nil, a.CaveMap, []*ebiten.Image{a.CaveTileset}, nil)
+
+	devil.OnInteract = func() {
+		i.dialogBox.ShowText(
+			"Hehehehehehehe",
+			nil,
+			BloodyText,
+			a.VoiceTwo,
+		)
+	}
+
+	i.Location = *NewLocation(ss, a, p, []*entity.NPC{devil}, a.CaveMap, []*ebiten.Image{a.CaveTileset}, nil)
 	i.returnScene = returnScene
 	i.exits = exits
 

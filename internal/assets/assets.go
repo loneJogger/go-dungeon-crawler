@@ -24,6 +24,7 @@ type Assets struct {
 	PCSprite     *ebiten.Image
 	NPCThief     *ebiten.Image
 	NPCBlackBelt *ebiten.Image
+	NPCDevil     *ebiten.Image
 	Font         *ebiten.Image
 	DialogBorder *ebiten.Image
 
@@ -86,6 +87,10 @@ func LoadAssets() (*Assets, error) {
 	if err != nil {
 		return nil, err
 	}
+	npcDevil, err := LoadImage("assets/sprites/devil.png")
+	if err != nil {
+		return nil, err
+	}
 	font, err := LoadImage("assets/ui/8BitFont.png")
 	if err != nil {
 		return nil, err
@@ -100,6 +105,7 @@ func LoadAssets() (*Assets, error) {
 		PCSprite:     pcSprite,
 		NPCThief:     npcThief,
 		NPCBlackBelt: npcBlackBelt,
+		NPCDevil:     npcDevil,
 		Font:         font,
 		AudioContext: audioContext,
 	}

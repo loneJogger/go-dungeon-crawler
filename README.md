@@ -3,10 +3,9 @@
 ## TODO
 
 ### Now
-- fix spiral so it fits screen
-- volume control for bgm vs. sfx
+- add "shopkeepers"
+- add action scene in inn
 ---
 ### Later
 - menu uses sprite font instead of debug print
 - menu in dialog
-- dialog with typewriter effect

@@ -17,8 +17,43 @@ func NewShop(ss scene.SceneSwitcher, a *assets.Assets, returnScene scene.Scene, 
 	p := entity.NewPlayer(startX, startY, a.PCSprite)
 	p.Direction = 2
 
+	weaponMerchant := entity.NewNPC(144, 112, 0)
+	weaponMerchant.Image = a.NPCThief
+	weaponMerchant.Wanders = false
+
+	itemMerchant := entity.NewNPC(464, 112, 0)
+	itemMerchant.Image = a.NPCBlackBelt
+	itemMerchant.Wanders = false
+
 	sh := &Shop{}
-	sh.Location = *NewLocation(ss, a, p, nil, a.ShopMap, []*ebiten.Image{a.CaveTileset, a.TownTileset}, nil)
+
+	weaponMerchant.OnInteract = func() {
+		sh.dialogBox.ShowText(
+			"Come see me once someone invents money.",
+			nil,
+			IcyBlueText,
+			a.VoiceOne,
+		)
+	}
+
+	itemMerchant.OnInteract = func() {
+		sh.dialogBox.ShowText(
+			"Come see me once someone invents money.",
+			nil,
+			IcyBlueText,
+			a.VoiceOne,
+		)
+	}
+
+	sh.Location = *NewLocation(
+		ss,
+		a,
+		p,
+		[]*entity.NPC{weaponMerchant, itemMerchant},
+		a.ShopMap,
+		[]*ebiten.Image{a.CaveTileset, a.TownTileset},
+		nil,
+	)
 	sh.returnScene = returnScene
 	sh.exits = exits
 
