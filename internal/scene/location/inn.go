@@ -6,6 +6,7 @@ import (
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
 	"github.com/loneJogger/go-dungeon-crawler/internal/game"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
+	"github.com/loneJogger/go-dungeon-crawler/internal/scene/battle"
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 )
 
@@ -26,7 +27,7 @@ func NewInn(ss scene.SceneSwitcher, a *assets.Assets, returnScene scene.Scene, s
 	devil.OnInteract = func() {
 		i.dialogBox.ShowText(
 			"Hehehehehehehe",
-			nil,
+			func() { ss.SetScene(battle.New()) },
 			BloodyText,
 			a.VoiceTwo,
 		)
