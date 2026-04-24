@@ -79,8 +79,16 @@ func (ms *MenuStack) Pop() {
 	}
 }
 
+func NewMenuStackWithSounds(root *Menu, cancelSound *audio.Player) *MenuStack {
+	return &MenuStack{stack: []*Menu{root}, CancelSound: cancelSound}
+}
+
 func (ms *MenuStack) Active() *Menu {
 	return ms.stack[len(ms.stack)-1]
+}
+
+func (ms *MenuStack) Stack() []*Menu {
+	return ms.stack
 }
 
 func (ms *MenuStack) Update() {

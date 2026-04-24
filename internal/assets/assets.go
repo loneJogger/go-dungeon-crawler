@@ -41,6 +41,7 @@ type Assets struct {
 	MenuNav     *audio.Player
 	MenuSelect  *audio.Player
 	MenuCancel  *audio.Player
+	MenuUp      *audio.Player
 	GameStart   *audio.Player
 	BattleStart *audio.Player
 	VoiceOne    *audio.Player
@@ -110,6 +111,7 @@ func LoadAssets() (*Assets, error) {
 		{&a.MenuNav, "assets/sfx/menuNav.wav", sfxSoftVolume},
 		{&a.MenuSelect, "assets/sfx/menuSelect.wav", sfxSoftVolume},
 		{&a.MenuCancel, "assets/sfx/menuCancel.wav", sfxSoftVolume},
+		{&a.MenuUp, "assets/sfx/menuUp.wav", sfxSoftVolume},
 		{&a.GameStart, "assets/sfx/gameStart.wav", sfxLoudVolume},
 		{&a.BattleStart, "assets/sfx/battleStart.wav", sfxLoudVolume},
 		{&a.VoiceOne, "assets/sfx/voice1.wav", BgmWorldVolume},

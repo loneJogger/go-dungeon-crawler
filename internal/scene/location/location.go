@@ -2,6 +2,7 @@ package location
 
 import (
 	"image"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -9,6 +10,7 @@ import (
 	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
+	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
 	"github.com/loneJogger/go-dungeon-crawler/internal/world"
 )
@@ -16,6 +18,15 @@ import (
 const TileSize = 16
 const screenW = 320
 const screenH = 240
+
+type menuState int
+
+const (
+	menuClosed menuState = iota
+	menuWipingIn
+	menuOpen
+	menuWipingOut
+)
 
 var PinkText = []float32{0.98, 0.653, 0.724, 1}
 var MintText = []float32{0.641, 0.949, 0.678, 1}
@@ -38,6 +49,10 @@ type Location struct {
 	exits         []scene.ExitConfig
 	cameraX       float64
 	cameraY       float64
+	systemMenu    *ui.MenuStack
+	menuState     menuState
+	menuWipe      *transition.WipeTransition
+	menuOverlay   *ebiten.Image
 }
 
 func NewLocation(
@@ -49,6 +64,18 @@ func NewLocation(
 	tilesets []*ebiten.Image,
 	onTrigger TriggerHandler,
 ) *Location {
+	overlay := ebiten.NewImage(screenW, screenH)
+	overlay.Fill(color.Black)
+
+	root := ui.NewMenu([]ui.MenuItem{
+		{Label: "Characters", OnSelect: func() {}},
+		{Label: "Items", OnSelect: func() {}},
+		{Label: "Save", OnSelect: func() {}},
+		{Label: "Close", OnSelect: func() {}},
+	})
+	root.NavSound = a.MenuNav
+	root.SelectSound = a.MenuSelect
+
 	l := &Location{
 		sceneSwitcher: ss,
 		assets:        a,
@@ -59,6 +86,8 @@ func NewLocation(
 		tileMap:       tm,
 		tilesets:      tilesets,
 		onTrigger:     onTrigger,
+		systemMenu:    ui.NewMenuStackWithSounds(root, a.MenuCancel),
+		menuOverlay:   overlay,
 	}
 	l.updateCamera()
 	return l
@@ -87,8 +116,39 @@ func (s *Location) updateCamera() {
 }
 
 func (s *Location) Update() error {
+	switch s.menuState {
+	case menuWipingIn:
+		s.menuWipe.Update()
+		if s.menuWipe.IsDone() {
+			s.menuState = menuOpen
+		}
+		return nil
+	case menuWipingOut:
+		s.menuWipe.Update()
+		if s.menuWipe.IsDone() {
+			s.menuState = menuClosed
+		}
+		return nil
+	case menuOpen:
+		if inpututil.IsKeyJustPressed(ebiten.KeyX) && len(s.systemMenu.Stack()) == 1 {
+			s.menuWipe = transition.NewWipe(transition.WipeDown)
+			s.menuState = menuWipingOut
+			return nil
+		}
+		s.systemMenu.Update()
+		return nil
+	}
+
 	if s.dialogBox.Active {
 		s.dialogBox.Update()
+		return nil
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
+		s.assets.MenuUp.Rewind()
+		s.assets.MenuUp.Play()
+		s.menuWipe = transition.NewWipe(transition.WipeUp)
+		s.menuState = menuWipingIn
 		return nil
 	}
 
@@ -132,6 +192,16 @@ func (s *Location) Draw(screen *ebiten.Image) {
 	s.player.OffsetX, s.player.OffsetY = s.cameraX, s.cameraY
 	s.player.Draw(screen)
 	s.dialogBox.Draw(screen)
+
+	switch s.menuState {
+	case menuWipingIn:
+		s.menuWipe.Draw(screen)
+	case menuWipingOut:
+		s.menuWipe.Draw(screen)
+	case menuOpen:
+		screen.DrawImage(s.menuOverlay, nil)
+		s.systemMenu.Draw(screen, s.assets.Font, 32, 32)
+	}
 }
 
 func (s *Location) SetPlayerPos(x, y float64) {
