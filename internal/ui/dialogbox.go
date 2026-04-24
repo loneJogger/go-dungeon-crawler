@@ -99,6 +99,6 @@ func (d *DialogBox) Draw(screen *ebiten.Image) {
 	case DialogModeText:
 		d.textScroll.Draw(screen, d.font, DialogBoxX, DialogBoxY)
 	case DialogModeMenu:
-		d.menu.Draw(screen, DialogBoxX+DialogPadding, DialogBoxY+DialogPadding)
+		d.menu.Draw(screen, d.font, DialogBoxX+DialogPadding, DialogBoxY+DialogPadding)
 	}
 }

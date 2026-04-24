@@ -4,15 +4,14 @@ import (
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene/location"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
 )
 
-const menuX = 100
-const menuY = 80
+const menuX = 64
+const menuY = 144
 
 type TitleScene struct {
 	sceneSwitcher scene.SceneSwitcher
@@ -50,18 +49,11 @@ func (s *TitleScene) Draw(screen *ebiten.Image) {
 		s.assets.DialogBorder,
 		menuX-8,
 		menuY-8,
-		120,
+		208,
 		72,
 	)
 
-	// Draw Menu with Debug Print for now
-	for i, item := range s.menu.Items {
-		label := "  " + item.Label
-		if i == s.menu.Focused() {
-			label = "> " + item.Label
-		}
-		ebitenutil.DebugPrintAt(screen, label, menuX, menuY+i*20)
-	}
+	s.menu.Draw(screen, s.assets.Font, menuX, menuY)
 }
 
 func (s *TitleScene) OnExit() {
