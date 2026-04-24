@@ -38,14 +38,16 @@ type Assets struct {
 	// sound
 	AudioContext *audio.Context
 	// sfx
-	MenuNav    *audio.Player
-	MenuSelect *audio.Player
-	GameStart  *audio.Player
-	VoiceOne   *audio.Player
-	VoiceTwo   *audio.Player
+	MenuNav     *audio.Player
+	MenuSelect  *audio.Player
+	GameStart   *audio.Player
+	BattleStart *audio.Player
+	VoiceOne    *audio.Player
+	VoiceTwo    *audio.Player
 	// bgm
-	TitleBGM *audio.Player
-	TownBGM  *audio.Player
+	TitleBGM  *audio.Player
+	TownBGM   *audio.Player
+	BattleBGM *audio.Player
 }
 
 func LoadAssets() (*Assets, error) {
@@ -125,6 +127,11 @@ func LoadAssets() (*Assets, error) {
 		return nil, err
 	}
 	gameStart.SetVolume(sfxLoudVolume)
+	battleStart, err := assets.LoadSound("assets/sfx/battleStart.wav")
+	if err != nil {
+		return nil, err
+	}
+	battleStart.SetVolume(sfxLoudVolume)
 	voiceOne, err := assets.LoadSound("assets/sfx/voice1.wav")
 	if err != nil {
 		return nil, err
@@ -145,14 +152,21 @@ func LoadAssets() (*Assets, error) {
 		return nil, err
 	}
 	townBgm.SetVolume(BgmWorldVolume)
+	battleBgm, err := assets.LoadBGM("assets/bgMusic/battle_theme.ogg")
+	if err != nil {
+		return nil, err
+	}
+	battleBgm.SetVolume(bgmTitleVolume)
 
 	assets.MenuNav = menuNav
 	assets.MenuSelect = menuSelect
 	assets.GameStart = gameStart
+	assets.BattleStart = battleStart
 	assets.VoiceOne = voiceOne
 	assets.VoiceTwo = voiceTwo
 	assets.TitleBGM = titleBgm
 	assets.TownBGM = townBgm
+	assets.BattleBGM = battleBgm
 
 	return assets, nil
 }

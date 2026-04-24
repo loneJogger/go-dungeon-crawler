@@ -20,14 +20,22 @@ func NewInn(ss scene.SceneSwitcher, a *assets.Assets, returnScene scene.Scene, s
 
 	devil := entity.NewNPC(128, 64, 0)
 	devil.Image = a.NPCDevil
-	devil.Wanders = true
+	// devil.Wanders = true
 
 	i := &Inn{}
 
 	devil.OnInteract = func() {
 		i.dialogBox.ShowText(
 			"Hehehehehehehe",
-			func() { ss.SetScene(battle.New()) },
+			func() {
+				a.TownBGM.Pause()
+				a.BattleStart.Rewind()
+				a.BattleStart.Play()
+				a.BattleBGM.Rewind()
+				a.BattleBGM.Play()
+				ss.SetScene(battle.New())
+
+			},
 			BloodyText,
 			a.VoiceTwo,
 		)
