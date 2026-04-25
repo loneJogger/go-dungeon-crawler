@@ -4,7 +4,7 @@ import "github.com/loneJogger/go-dungeon-crawler/internal/combat/characters"
 
 type Party struct {
 	Members []*characters.Character
-	Money   int
+	Gold    int
 }
 
 func New() *Party {
@@ -17,6 +17,6 @@ func New() *Party {
 			&witch.Character,
 			&priest.Character,
 		},
-		Money: 0,
+		Gold: 0,
 	}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type GameContext struct {
-	Assets *assets.Assets
-	Party  *party.Party
-	SS     scene.SceneSwitcher
+	Assets     *assets.Assets
+	Party      *party.Party
+	ScSwitcher scene.SceneSwitcher
 }

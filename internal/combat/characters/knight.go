@@ -12,7 +12,7 @@ func NewKnight() *Knight {
 
 	return &Knight{
 		Character: Character{
-			Name:          "Bonnie",
+			Name:          "Maren",
 			Level:         15,
 			Experience:    0,
 			TotalHP:       135,

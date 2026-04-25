@@ -11,7 +11,7 @@ type Priest struct {
 func NewPriest() *Priest {
 	return &Priest{
 		Character: Character{
-			Name:          "Anthony",
+			Name:          "Ambrose",
 			Level:         15,
 			Experience:    0,
 			TotalHP:       88,
