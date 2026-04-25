@@ -3,26 +3,26 @@ package location
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
+	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
-	"github.com/loneJogger/go-dungeon-crawler/internal/game"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 )
 
 type Shop struct {
-	Location
+	*Location
 }
 
-func NewShop(ss scene.SceneSwitcher, a *assets.Assets, returnScene scene.Scene, startX, startY float64, exits []scene.ExitConfig) *Shop {
-	p := entity.NewPlayer(startX, startY, a.PCSprite)
+func NewShop(c *ctx.GameContext, returnScene scene.Scene, startX, startY float64, exits []scene.ExitConfig) *Shop {
+	p := entity.NewPlayer(startX, startY, c.Assets.PCSprite)
 	p.Direction = 2
 
 	weaponMerchant := entity.NewNPC(144, 112, 0)
-	weaponMerchant.Image = a.NPCThief
+	weaponMerchant.Image = c.Assets.NPCThief
 	weaponMerchant.Wanders = false
 
 	itemMerchant := entity.NewNPC(464, 112, 0)
-	itemMerchant.Image = a.NPCBlackBelt
+	itemMerchant.Image = c.Assets.NPCBlackBelt
 	itemMerchant.Wanders = false
 
 	sh := &Shop{}
@@ -32,7 +32,7 @@ func NewShop(ss scene.SceneSwitcher, a *assets.Assets, returnScene scene.Scene, 
 			"Come see me once someone invents money.",
 			nil,
 			IcyBlueText,
-			a.VoiceOne,
+			c.Assets.VoiceOne,
 		)
 	}
 
@@ -41,17 +41,16 @@ func NewShop(ss scene.SceneSwitcher, a *assets.Assets, returnScene scene.Scene, 
 			"Come see me once someone invents money.",
 			nil,
 			IcyBlueText,
-			a.VoiceOne,
+			c.Assets.VoiceOne,
 		)
 	}
 
-	sh.Location = *NewLocation(
-		ss,
-		a,
+	sh.Location = NewLocation(
+		c,
 		p,
 		[]*entity.NPC{weaponMerchant, itemMerchant},
-		a.ShopMap,
-		[]*ebiten.Image{a.CaveTileset, a.TownTileset},
+		c.Assets.ShopMap,
+		[]*ebiten.Image{c.Assets.CaveTileset, c.Assets.TownTileset},
 		nil,
 	)
 	sh.returnScene = returnScene
@@ -64,14 +63,14 @@ func (s *Shop) TransitionPhase() transition.Phase {
 	return transition.Opening
 }
 
-func (s *Shop) TransitionType() game.TransitionType {
-	return game.TransitionBox
+func (s *Shop) TransitionType() transition.TransitionType {
+	return transition.TransitionBox
 }
 
 func (s *Shop) OnEnter() {
-	s.assets.TownBGM.SetVolume(assets.BgmInteriorVolume)
+	s.ctx.Assets.TownBGM.SetVolume(assets.BgmInteriorVolume)
 }
 
 func (s *Shop) OnExit() {
-	s.assets.TownBGM.SetVolume(assets.BgmWorldVolume)
+	s.ctx.Assets.TownBGM.SetVolume(assets.BgmWorldVolume)
 }

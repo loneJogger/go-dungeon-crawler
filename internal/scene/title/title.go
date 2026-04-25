@@ -4,36 +4,33 @@ import (
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
-	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
+	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene/location"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
 )
 
-const menuX = 100
-const menuY = 80
+const menuX = 64
+const menuY = 144
 
 type TitleScene struct {
-	sceneSwitcher scene.SceneSwitcher
-	menu          ui.Menu
-	assets        *assets.Assets
+	ctx  *ctx.GameContext
+	menu ui.Menu
 }
 
-func New(ss scene.SceneSwitcher, a *assets.Assets) *TitleScene {
-	s := &TitleScene{sceneSwitcher: ss, assets: a}
+func New(c *ctx.GameContext) *TitleScene {
+	s := &TitleScene{ctx: c}
 	s.menu = *ui.NewMenu([]ui.MenuItem{
 		{Label: "New Game", OnSelect: func() {
-			a.GameStart.Rewind()
-			a.GameStart.Play()
-			ss.SetScene(location.NewTown(ss, a))
+			c.Assets.GameStart.Rewind()
+			c.Assets.GameStart.Play()
+			c.SS.SetScene(location.NewTown(c))
 		}},
 		{Label: "Continue", OnSelect: func() { /* TODO */ }},
 		{Label: "Exit", OnSelect: func() { os.Exit(0) }},
 	})
-	s.menu.NavSound = a.MenuNav
-	s.menu.SelectSound = a.MenuSelect
-	a.TitleBGM.Play()
+	s.menu.NavSound = c.Assets.MenuNav
+	s.menu.SelectSound = c.Assets.MenuSelect
+	c.Assets.TitleBGM.Play()
 	return s
 }
 
@@ -43,27 +40,17 @@ func (s *TitleScene) Update() error {
 }
 
 func (s *TitleScene) Draw(screen *ebiten.Image) {
-
-	// Draw Dialog Box around Menu
 	ui.DrawDialogBox(
 		screen,
-		s.assets.DialogBorder,
+		s.ctx.Assets.DialogBorder,
 		menuX-8,
 		menuY-8,
-		120,
+		208,
 		72,
 	)
-
-	// Draw Menu with Debug Print for now
-	for i, item := range s.menu.Items {
-		label := "  " + item.Label
-		if i == s.menu.Focused() {
-			label = "> " + item.Label
-		}
-		ebitenutil.DebugPrintAt(screen, label, menuX, menuY+i*20)
-	}
+	s.menu.Draw(screen, s.ctx.Assets.Font, menuX, menuY)
 }
 
 func (s *TitleScene) OnExit() {
-	s.assets.TitleBGM.Pause()
+	s.ctx.Assets.TitleBGM.Pause()
 }

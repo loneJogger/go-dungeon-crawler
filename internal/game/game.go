@@ -2,30 +2,40 @@ package game
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
+	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
+	"github.com/loneJogger/go-dungeon-crawler/internal/party"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
+	"github.com/loneJogger/go-dungeon-crawler/internal/scene/title"
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
-)
-
-type TransitionType int
-
-const (
-	TransitionSpiral TransitionType = iota
-	TransitionBox
 )
 
 type TransitionStarter interface {
 	TransitionPhase() transition.Phase
-	TransitionType() TransitionType
+	TransitionType() transition.TransitionType
 }
 
 type Game struct {
 	current    scene.Scene
 	pending    scene.Scene
 	transition transition.Transition
+	ctx        *ctx.GameContext
 }
 
-func New() *Game {
-	return &Game{}
+func New() (*Game, error) {
+	a, err := assets.LoadAssets()
+	if err != nil {
+		return nil, err
+	}
+
+	g := &Game{}
+	g.ctx = &ctx.GameContext{
+		Assets: a,
+		Party:  party.New(),
+		SS:     g,
+	}
+	g.SetScene(title.New(g.ctx))
+	return g, nil
 }
 
 func (g *Game) SetScene(s scene.Scene) {
@@ -42,14 +52,14 @@ func (g *Game) SetScene(s scene.Scene) {
 	g.pending = s
 
 	phase := transition.Closing
-	tType := TransitionSpiral
+	tType := transition.TransitionSpiral
 	if ts, ok := s.(TransitionStarter); ok {
 		phase = ts.TransitionPhase()
 		tType = ts.TransitionType()
 	}
 
 	switch tType {
-	case TransitionBox:
+	case transition.TransitionBox:
 		g.transition = transition.NewBox(phase)
 	default:
 		g.transition = transition.New(phase)

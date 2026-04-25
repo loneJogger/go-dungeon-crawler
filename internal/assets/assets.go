@@ -38,123 +38,111 @@ type Assets struct {
 	// sound
 	AudioContext *audio.Context
 	// sfx
-	MenuNav    *audio.Player
-	MenuSelect *audio.Player
-	GameStart  *audio.Player
-	VoiceOne   *audio.Player
-	VoiceTwo   *audio.Player
+	MenuNav     *audio.Player
+	MenuSelect  *audio.Player
+	MenuCancel  *audio.Player
+	MenuUp      *audio.Player
+	MenuDown    *audio.Player
+	GameStart   *audio.Player
+	BattleStart *audio.Player
+	VoiceOne    *audio.Player
+	VoiceTwo    *audio.Player
 	// bgm
-	TitleBGM *audio.Player
-	TownBGM  *audio.Player
+	TitleBGM  *audio.Player
+	TownBGM   *audio.Player
+	BattleBGM *audio.Player
+}
+
+type imageEntry struct {
+	dest *(*ebiten.Image)
+	path string
+}
+
+type soundEntry struct {
+	dest   *(*audio.Player)
+	path   string
+	volume float64
+}
+
+type bgmEntry struct {
+	dest   *(*audio.Player)
+	path   string
+	volume float64
 }
 
 func LoadAssets() (*Assets, error) {
 	audioContext := audio.NewContext(44100)
+	a := &Assets{AudioContext: audioContext}
 
-	dialogBorder, err := LoadImage("assets/ui/dialog_border.png")
-	if err != nil {
-		return nil, err
+	images := []imageEntry{
+		{&a.DialogBorder, "assets/ui/dialog_border.png"},
+		{&a.Font, "assets/ui/8BitFont.png"},
+		{&a.TownTileset, "assets/tilesets/ff_town.png"},
+		{&a.CaveTileset, "assets/tilesets/ff_cave.png"},
+		{&a.PCSprite, "assets/sprites/red_mage.png"},
+		{&a.NPCThief, "assets/sprites/thief.png"},
+		{&a.NPCBlackBelt, "assets/sprites/black_belt.png"},
+		{&a.NPCDevil, "assets/sprites/devil.png"},
 	}
-	townMap, err := tiled.LoadFile("assets/tiledMaps/ff_town.tmx")
-	if err != nil {
-		return nil, err
-	}
-	townTileset, err := LoadImage("assets/tilesets/ff_town.png")
-	if err != nil {
-		return nil, err
-	}
-	caveMap, err := tiled.LoadFile("assets/tiledMaps/ff_cave.tmx")
-	if err != nil {
-		return nil, err
-	}
-	shopMap, err := tiled.LoadFile("assets/tiledMaps/shop.tmx")
-	if err != nil {
-		return nil, err
-	}
-	caveTileset, err := LoadImage("assets/tilesets/ff_cave.png")
-	if err != nil {
-		return nil, err
-	}
-	pcSprite, err := LoadImage("assets/sprites/red_mage.png")
-	if err != nil {
-		return nil, err
-	}
-	npcThief, err := LoadImage("assets/sprites/thief.png")
-	if err != nil {
-		return nil, err
-	}
-	npcBlackBelt, err := LoadImage("assets/sprites/black_belt.png")
-	if err != nil {
-		return nil, err
-	}
-	npcDevil, err := LoadImage("assets/sprites/devil.png")
-	if err != nil {
-		return nil, err
-	}
-	font, err := LoadImage("assets/ui/8BitFont.png")
-	if err != nil {
-		return nil, err
-	}
-	assets := &Assets{
-		DialogBorder: dialogBorder,
-		TownMap:      townMap,
-		TownTileset:  townTileset,
-		CaveMap:      caveMap,
-		ShopMap:      shopMap,
-		CaveTileset:  caveTileset,
-		PCSprite:     pcSprite,
-		NPCThief:     npcThief,
-		NPCBlackBelt: npcBlackBelt,
-		NPCDevil:     npcDevil,
-		Font:         font,
-		AudioContext: audioContext,
+	for _, e := range images {
+		img, err := LoadImage(e.path)
+		if err != nil {
+			return nil, err
+		}
+		*e.dest = img
 	}
 
-	menuNav, err := assets.LoadSound("assets/sfx/menuNav.wav")
-	if err != nil {
-		return nil, err
+	maps := []struct {
+		dest *(*tiled.Map)
+		path string
+	}{
+		{&a.TownMap, "assets/tiledMaps/ff_town.tmx"},
+		{&a.CaveMap, "assets/tiledMaps/ff_cave.tmx"},
+		{&a.ShopMap, "assets/tiledMaps/shop.tmx"},
 	}
-	menuNav.SetVolume(sfxSoftVolume)
-	menuSelect, err := assets.LoadSound("assets/sfx/menuSelect.wav")
-	if err != nil {
-		return nil, err
+	for _, e := range maps {
+		m, err := tiled.LoadFile(e.path)
+		if err != nil {
+			return nil, err
+		}
+		*e.dest = m
 	}
-	menuSelect.SetVolume(sfxSoftVolume)
-	gameStart, err := assets.LoadSound("assets/sfx/gameStart.wav")
-	if err != nil {
-		return nil, err
-	}
-	gameStart.SetVolume(sfxLoudVolume)
-	voiceOne, err := assets.LoadSound("assets/sfx/voice1.wav")
-	if err != nil {
-		return nil, err
-	}
-	voiceOne.SetVolume(BgmWorldVolume)
-	voiceTwo, err := assets.LoadSound("assets/sfx/voice2.wav")
-	if err != nil {
-		return nil, err
-	}
-	voiceTwo.SetVolume(BgmWorldVolume)
-	titleBgm, err := assets.LoadBGM("assets/bgMusic/title_theme.ogg")
-	if err != nil {
-		return nil, err
-	}
-	titleBgm.SetVolume(bgmTitleVolume)
-	townBgm, err := assets.LoadBGM("assets/bgMusic/town_theme.ogg")
-	if err != nil {
-		return nil, err
-	}
-	townBgm.SetVolume(BgmWorldVolume)
 
-	assets.MenuNav = menuNav
-	assets.MenuSelect = menuSelect
-	assets.GameStart = gameStart
-	assets.VoiceOne = voiceOne
-	assets.VoiceTwo = voiceTwo
-	assets.TitleBGM = titleBgm
-	assets.TownBGM = townBgm
+	sounds := []soundEntry{
+		{&a.MenuNav, "assets/sfx/menuNav.wav", sfxSoftVolume},
+		{&a.MenuSelect, "assets/sfx/menuSelect.wav", sfxSoftVolume},
+		{&a.MenuCancel, "assets/sfx/menuCancel.wav", sfxSoftVolume},
+		{&a.MenuUp, "assets/sfx/menuUp.wav", sfxSoftVolume},
+		{&a.MenuDown, "assets/sfx/menuDown.wav", sfxSoftVolume},
+		{&a.GameStart, "assets/sfx/gameStart.wav", sfxLoudVolume},
+		{&a.BattleStart, "assets/sfx/battleStart.wav", sfxLoudVolume},
+		{&a.VoiceOne, "assets/sfx/voice1.wav", BgmWorldVolume},
+		{&a.VoiceTwo, "assets/sfx/voice2.wav", BgmWorldVolume},
+	}
+	for _, e := range sounds {
+		p, err := a.LoadSound(e.path)
+		if err != nil {
+			return nil, err
+		}
+		p.SetVolume(e.volume)
+		*e.dest = p
+	}
 
-	return assets, nil
+	bgms := []bgmEntry{
+		{&a.TitleBGM, "assets/bgMusic/title_theme.ogg", bgmTitleVolume},
+		{&a.TownBGM, "assets/bgMusic/town_theme.ogg", BgmWorldVolume},
+		{&a.BattleBGM, "assets/bgMusic/battle_theme.ogg", bgmTitleVolume},
+	}
+	for _, e := range bgms {
+		p, err := a.LoadBGM(e.path)
+		if err != nil {
+			return nil, err
+		}
+		p.SetVolume(e.volume)
+		*e.dest = p
+	}
+
+	return a, nil
 }
 
 func LoadImage(path string) (*ebiten.Image, error) {
