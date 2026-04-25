@@ -31,7 +31,7 @@ func GetMagicalDamage(
 		int(
 			math.Pow(float64(attacker.Intelligence), 2)/
 				float64(attacker.Intelligence-defender.Spirit)*
-				variance*float64(defender.Resistences[element]),
+				variance/float64(defender.Resistences[element]),
 		),
 		1,
 	)

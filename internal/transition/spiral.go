@@ -13,6 +13,13 @@ const (
 	Opening
 )
 
+type TransitionType int
+
+const (
+	TransitionSpiral TransitionType = iota
+	TransitionBox
+)
+
 type Transition interface {
 	Update()
 	Draw(screen *ebiten.Image)

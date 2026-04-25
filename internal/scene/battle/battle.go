@@ -3,7 +3,6 @@ package battle
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/loneJogger/go-dungeon-crawler/internal/game"
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 )
 
@@ -25,6 +24,6 @@ func (s *BattleScene) TransitionPhase() transition.Phase {
 	return transition.Closing
 }
 
-func (s *BattleScene) TransitionType() game.TransitionType {
-	return game.TransitionSpiral
+func (s *BattleScene) TransitionType() transition.TransitionType {
+	return transition.TransitionSpiral
 }

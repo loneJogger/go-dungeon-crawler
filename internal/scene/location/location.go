@@ -7,7 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/lafriks/go-tiled"
-	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
+	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
@@ -36,28 +36,26 @@ var BloodyText = []float32{0.6, 0.063, 0.047, 1}
 type TriggerHandler func(name string)
 
 type Location struct {
-	sceneSwitcher scene.SceneSwitcher
-	assets        *assets.Assets
-	player        *entity.Player
-	npcs          []*entity.NPC
-	dialogBox     *ui.DialogBox
-	triggers      []world.Trigger
-	tileMap       *tiled.Map
-	tilesets      []*ebiten.Image
-	onTrigger     TriggerHandler
-	returnScene   scene.Scene
-	exits         []scene.ExitConfig
-	cameraX       float64
-	cameraY       float64
-	systemMenu    *ui.MenuStack
-	menuState     menuState
-	menuWipe      *transition.WipeTransition
-	menuOverlay   *ebiten.Image
+	ctx         *ctx.GameContext
+	player      *entity.Player
+	npcs        []*entity.NPC
+	dialogBox   *ui.DialogBox
+	triggers    []world.Trigger
+	tileMap     *tiled.Map
+	tilesets    []*ebiten.Image
+	onTrigger   TriggerHandler
+	returnScene scene.Scene
+	exits       []scene.ExitConfig
+	cameraX     float64
+	cameraY     float64
+	systemMenu  *ui.MenuStack
+	menuState   menuState
+	menuWipe    *transition.WipeTransition
+	menuOverlay *ebiten.Image
 }
 
 func NewLocation(
-	ss scene.SceneSwitcher,
-	a *assets.Assets,
+	c *ctx.GameContext,
 	p *entity.Player,
 	npcs []*entity.NPC,
 	tm *tiled.Map,
@@ -67,28 +65,33 @@ func NewLocation(
 	overlay := ebiten.NewImage(screenW, screenH)
 	overlay.Fill(color.Black)
 
+	l := &Location{
+		ctx:         c,
+		player:      p,
+		npcs:        npcs,
+		dialogBox:   ui.NewDialogBox(c.Assets.Font, c.Assets.DialogBorder),
+		triggers:    world.LoadTriggers(tm),
+		tileMap:     tm,
+		tilesets:    tilesets,
+		onTrigger:   onTrigger,
+		menuOverlay: overlay,
+	}
+
 	root := ui.NewMenu([]ui.MenuItem{
 		{Label: "Characters", OnSelect: func() {}},
 		{Label: "Items", OnSelect: func() {}},
 		{Label: "Save", OnSelect: func() {}},
-		{Label: "Close", OnSelect: func() {}},
+		{Label: "Close", OnSelect: func() {
+			c.Assets.MenuDown.Rewind()
+			c.Assets.MenuDown.Play()
+			l.menuWipe = transition.NewWipe(transition.WipeDown)
+			l.menuState = menuWipingOut
+		}},
 	})
-	root.NavSound = a.MenuNav
-	root.SelectSound = a.MenuSelect
+	root.NavSound = c.Assets.MenuNav
+	root.SelectSound = c.Assets.MenuSelect
+	l.systemMenu = ui.NewMenuStackWithSounds(root, c.Assets.MenuCancel)
 
-	l := &Location{
-		sceneSwitcher: ss,
-		assets:        a,
-		player:        p,
-		npcs:          npcs,
-		dialogBox:     ui.NewDialogBox(a.Font, a.DialogBorder),
-		triggers:      world.LoadTriggers(tm),
-		tileMap:       tm,
-		tilesets:      tilesets,
-		onTrigger:     onTrigger,
-		systemMenu:    ui.NewMenuStackWithSounds(root, a.MenuCancel),
-		menuOverlay:   overlay,
-	}
 	l.updateCamera()
 	return l
 }
@@ -131,6 +134,8 @@ func (s *Location) Update() error {
 		return nil
 	case menuOpen:
 		if inpututil.IsKeyJustPressed(ebiten.KeyX) && len(s.systemMenu.Stack()) == 1 {
+			s.ctx.Assets.MenuDown.Rewind()
+			s.ctx.Assets.MenuDown.Play()
 			s.menuWipe = transition.NewWipe(transition.WipeDown)
 			s.menuState = menuWipingOut
 			return nil
@@ -145,8 +150,8 @@ func (s *Location) Update() error {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
-		s.assets.MenuUp.Rewind()
-		s.assets.MenuUp.Play()
+		s.ctx.Assets.MenuUp.Rewind()
+		s.ctx.Assets.MenuUp.Play()
 		s.menuWipe = transition.NewWipe(transition.WipeUp)
 		s.menuState = menuWipingIn
 		return nil
@@ -171,7 +176,7 @@ func (s *Location) Update() error {
 				if pp, ok := s.returnScene.(scene.PlayerPositioner); ok {
 					pp.SetPlayerPos(exit.ReturnX, exit.ReturnY)
 				}
-				s.sceneSwitcher.SetScene(s.returnScene)
+				s.ctx.SS.SetScene(s.returnScene)
 				return nil
 			}
 		}
@@ -200,7 +205,7 @@ func (s *Location) Draw(screen *ebiten.Image) {
 		s.menuWipe.Draw(screen)
 	case menuOpen:
 		screen.DrawImage(s.menuOverlay, nil)
-		s.systemMenu.Draw(screen, s.assets.Font, 32, 32)
+		s.systemMenu.Draw(screen, s.ctx.Assets.Font, 32, 32)
 	}
 }
 
