@@ -11,7 +11,7 @@ type Witch struct {
 func NewWitch() *Witch {
 	return &Witch{
 		Character: Character{
-			Name:          "Thecla",
+			Name:          "Isolde",
 			Level:         15,
 			Experience:    0,
 			TotalHP:       72,

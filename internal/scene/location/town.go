@@ -62,21 +62,21 @@ func NewTown(c *ctx.GameContext) *Town {
 				inn := NewInn(c, t, 240, 176, []scene.ExitConfig{
 					{TriggerName: "inn_exit", ReturnX: returnX, ReturnY: returnY},
 				})
-				c.SS.SetScene(inn)
+				c.ScSwitcher.SetScene(inn)
 			case "west_shop_entrance":
 				t.player.Direction = 0
 				shop := NewShop(c, t, 128, 176, []scene.ExitConfig{
 					{TriggerName: "west_shop_exit", ReturnX: 144, ReturnY: 144},
 					{TriggerName: "east_shop_exit", ReturnX: 224, ReturnY: 144},
 				})
-				c.SS.SetScene(shop)
+				c.ScSwitcher.SetScene(shop)
 			case "east_shop_entrance":
 				t.player.Direction = 0
 				shop := NewShop(c, t, 528, 176, []scene.ExitConfig{
 					{TriggerName: "west_shop_exit", ReturnX: 144, ReturnY: 144},
 					{TriggerName: "east_shop_exit", ReturnX: 224, ReturnY: 144},
 				})
-				c.SS.SetScene(shop)
+				c.ScSwitcher.SetScene(shop)
 			}
 		},
 	)

@@ -33,7 +33,7 @@ func NewInn(c *ctx.GameContext, returnScene scene.Scene, startX, startY float64,
 				c.Assets.BattleStart.Play()
 				c.Assets.BattleBGM.Rewind()
 				c.Assets.BattleBGM.Play()
-				c.SS.SetScene(battle.New())
+				c.ScSwitcher.SetScene(battle.New())
 			},
 			BloodyText,
 			c.Assets.VoiceTwo,

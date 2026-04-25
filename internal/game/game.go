@@ -30,9 +30,9 @@ func New() (*Game, error) {
 
 	g := &Game{}
 	g.ctx = &ctx.GameContext{
-		Assets: a,
-		Party:  party.New(),
-		SS:     g,
+		Assets:     a,
+		Party:      party.New(),
+		ScSwitcher: g,
 	}
 	g.SetScene(title.New(g.ctx))
 	return g, nil

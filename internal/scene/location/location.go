@@ -78,7 +78,9 @@ func NewLocation(
 	}
 
 	root := ui.NewMenu([]ui.MenuItem{
-		{Label: "Characters", OnSelect: func() {}},
+		{Label: "Characters", OnSelect: func() {
+			l.systemMenu.Push(buildCharacterListMenu(c, l.systemMenu))
+		}},
 		{Label: "Items", OnSelect: func() {}},
 		{Label: "Save", OnSelect: func() {}},
 		{Label: "Close", OnSelect: func() {
@@ -176,7 +178,7 @@ func (s *Location) Update() error {
 				if pp, ok := s.returnScene.(scene.PlayerPositioner); ok {
 					pp.SetPlayerPos(exit.ReturnX, exit.ReturnY)
 				}
-				s.ctx.SS.SetScene(s.returnScene)
+				s.ctx.ScSwitcher.SetScene(s.returnScene)
 				return nil
 			}
 		}

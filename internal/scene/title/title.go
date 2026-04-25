@@ -23,7 +23,7 @@ func New(c *ctx.GameContext) *TitleScene {
 		{Label: "New Game", OnSelect: func() {
 			c.Assets.GameStart.Rewind()
 			c.Assets.GameStart.Play()
-			c.SS.SetScene(location.NewTown(c))
+			c.ScSwitcher.SetScene(location.NewTown(c))
 		}},
 		{Label: "Continue", OnSelect: func() { /* TODO */ }},
 		{Label: "Exit", OnSelect: func() { os.Exit(0) }},
