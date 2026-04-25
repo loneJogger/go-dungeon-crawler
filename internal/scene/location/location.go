@@ -7,6 +7,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/lafriks/go-tiled"
+	"os"
+
 	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
@@ -48,10 +50,11 @@ type Location struct {
 	exits       []scene.ExitConfig
 	cameraX     float64
 	cameraY     float64
-	systemMenu  *ui.MenuStack
-	menuState   menuState
-	menuWipe    *transition.WipeTransition
-	menuOverlay *ebiten.Image
+	systemMenu   *ui.MenuStack
+	menuState    menuState
+	menuWipe     *transition.WipeTransition
+	menuOverlay  *ebiten.Image
+	shuttingDown bool
 }
 
 func NewLocation(
@@ -83,11 +86,11 @@ func NewLocation(
 		}},
 		{Label: "Items", OnSelect: func() {}},
 		{Label: "Save", OnSelect: func() {}},
-		{Label: "Close", OnSelect: func() {
-			c.Assets.MenuDown.Rewind()
-			c.Assets.MenuDown.Play()
-			l.menuWipe = transition.NewWipe(transition.WipeDown)
-			l.menuState = menuWipingOut
+		{Label: "Exit Game", OnSelect: func() {
+			c.Assets.TownBGM.Pause()
+			c.Assets.GameStart.Rewind()
+			c.Assets.GameStart.Play()
+			l.shuttingDown = true
 		}},
 	})
 	root.NavSound = c.Assets.MenuNav
@@ -121,6 +124,13 @@ func (s *Location) updateCamera() {
 }
 
 func (s *Location) Update() error {
+	if s.shuttingDown {
+		if !s.ctx.Assets.GameStart.IsPlaying() {
+			os.Exit(0)
+		}
+		return nil
+	}
+
 	switch s.menuState {
 	case menuWipingIn:
 		s.menuWipe.Update()
@@ -135,7 +145,7 @@ func (s *Location) Update() error {
 		}
 		return nil
 	case menuOpen:
-		if inpututil.IsKeyJustPressed(ebiten.KeyX) && len(s.systemMenu.Stack()) == 1 {
+		if (inpututil.IsKeyJustPressed(ebiten.KeyX) && len(s.systemMenu.Stack()) == 1) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
 			s.ctx.Assets.MenuDown.Rewind()
 			s.ctx.Assets.MenuDown.Play()
 			s.menuWipe = transition.NewWipe(transition.WipeDown)
