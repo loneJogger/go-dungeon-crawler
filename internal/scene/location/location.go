@@ -4,17 +4,18 @@ import (
 	"image"
 	"image/color"
 
+	"os"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/lafriks/go-tiled"
-	"os"
 
 	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
+	"github.com/loneJogger/go-dungeon-crawler/internal/scene/explore"
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
-	"github.com/loneJogger/go-dungeon-crawler/internal/world"
 )
 
 const TileSize = 16
@@ -38,18 +39,18 @@ var BloodyText = []float32{0.6, 0.063, 0.047, 1}
 type TriggerHandler func(name string)
 
 type Location struct {
-	ctx         *ctx.GameContext
-	player      *entity.Player
-	npcs        []*entity.NPC
-	dialogBox   *ui.DialogBox
-	triggers    []world.Trigger
-	tileMap     *tiled.Map
-	tilesets    []*ebiten.Image
-	onTrigger   TriggerHandler
-	returnScene scene.Scene
-	exits       []scene.ExitConfig
-	cameraX     float64
-	cameraY     float64
+	ctx          *ctx.GameContext
+	player       *entity.Player
+	npcs         []*entity.NPC
+	dialogBox    *ui.DialogBox
+	triggers     []explore.Trigger
+	tileMap      *tiled.Map
+	tilesets     []*ebiten.Image
+	onTrigger    TriggerHandler
+	returnScene  scene.Scene
+	exits        []scene.ExitConfig
+	cameraX      float64
+	cameraY      float64
 	systemMenu   *ui.MenuStack
 	menuState    menuState
 	menuWipe     *transition.WipeTransition
@@ -73,7 +74,7 @@ func NewLocation(
 		player:      p,
 		npcs:        npcs,
 		dialogBox:   ui.NewDialogBox(c.Assets.Font, c.Assets.DialogBorder),
-		triggers:    world.LoadTriggers(tm),
+		triggers:    explore.LoadTriggers(tm),
 		tileMap:     tm,
 		tilesets:    tilesets,
 		onTrigger:   onTrigger,
@@ -183,7 +184,7 @@ func (s *Location) Update() error {
 		s.checkInteraction()
 	}
 
-	trigger := world.CheckTrigger(s.triggers, s.player.X+8, s.player.Y+12)
+	trigger := explore.CheckTrigger(s.triggers, s.player.X+8, s.player.Y+12)
 	if trigger != nil {
 		for _, exit := range s.exits {
 			if trigger.Name == exit.TriggerName {
@@ -203,7 +204,7 @@ func (s *Location) Update() error {
 }
 
 func (s *Location) Draw(screen *ebiten.Image) {
-	world.DrawMap(screen, s.tileMap, s.tilesets, s.cameraX, s.cameraY)
+	explore.DrawMap(screen, s.tileMap, s.tilesets, s.cameraX, s.cameraY)
 	for _, npc := range s.npcs {
 		npc.OffsetX, npc.OffsetY = s.cameraX, s.cameraY
 		npc.Draw(screen)
