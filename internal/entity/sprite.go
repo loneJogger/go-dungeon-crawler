@@ -6,7 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/lafriks/go-tiled"
 
-	"github.com/loneJogger/go-dungeon-crawler/internal/scene/explore"
+	"github.com/loneJogger/go-dungeon-crawler/internal/tilemap"
 )
 
 const tileSize = 16
@@ -56,18 +56,18 @@ func (s *Sprite) OutOfBounds(m *tiled.Map, nx, ny float64) bool {
 func (s *Sprite) IsSolidAt(m *tiled.Map, nx, ny float64) bool {
 	switch s.Direction {
 	case 0: // down
-		return explore.IsCollison(m, nx+collideLeft, ny+collideBottom) ||
-			explore.IsCollison(m, nx+collideRight, ny+collideBottom)
+		return tilemap.IsCollison(m, nx+collideLeft, ny+collideBottom) ||
+			tilemap.IsCollison(m, nx+collideRight, ny+collideBottom)
 	case 2: // up
-		return explore.IsCollison(m, nx+collideLeft, ny+collideTop) ||
-			explore.IsCollison(m, nx+collideRight, ny+collideTop)
+		return tilemap.IsCollison(m, nx+collideLeft, ny+collideTop) ||
+			tilemap.IsCollison(m, nx+collideRight, ny+collideTop)
 	case 1:
 		if !s.FacingRight {
-			return explore.IsCollison(m, nx+collideLeft, ny+collideTop) ||
-				explore.IsCollison(m, nx+collideLeft, ny+collideBottom)
+			return tilemap.IsCollison(m, nx+collideLeft, ny+collideTop) ||
+				tilemap.IsCollison(m, nx+collideLeft, ny+collideBottom)
 		}
-		return explore.IsCollison(m, nx+collideRight, ny+collideTop) ||
-			explore.IsCollison(m, nx+collideRight, ny+collideBottom)
+		return tilemap.IsCollison(m, nx+collideRight, ny+collideTop) ||
+			tilemap.IsCollison(m, nx+collideRight, ny+collideBottom)
 	}
 	return false
 }

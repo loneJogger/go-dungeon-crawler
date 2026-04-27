@@ -1,4 +1,4 @@
-package explore
+package tilemap
 
 import (
 	"image"
@@ -16,7 +16,6 @@ type Trigger struct {
 
 type TriggerHandler func(name string)
 
-// returns a list of Triggers in a Tiled Map
 func LoadTriggers(m *tiled.Map) []Trigger {
 	var triggers []Trigger
 	for _, group := range m.ObjectGroups {
@@ -38,7 +37,6 @@ func LoadTriggers(m *tiled.Map) []Trigger {
 	return triggers
 }
 
-// returns a trigger at a given coordinate
 func CheckTrigger(triggers []Trigger, x, y float64) *Trigger {
 	pt := image.Pt(int(x), int(y))
 	for i := range triggers {
@@ -49,7 +47,6 @@ func CheckTrigger(triggers []Trigger, x, y float64) *Trigger {
 	return nil
 }
 
-// checks a Tiled map for collision at a given coordinate
 func IsCollison(m *tiled.Map, x, y float64) bool {
 	tileX := int(x) / 16
 	tileY := int(y) / 16
@@ -62,7 +59,6 @@ func IsCollison(m *tiled.Map, x, y float64) bool {
 	return false
 }
 
-// draws a Tiled map to the screen
 func DrawMap(screen *ebiten.Image, m *tiled.Map, tilesets []*ebiten.Image, cx, cy float64) {
 	for _, layer := range m.Layers {
 		for i, tile := range layer.Tiles {

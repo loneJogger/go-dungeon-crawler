@@ -12,8 +12,8 @@ import (
 
 	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
+	"github.com/loneJogger/go-dungeon-crawler/internal/tilemap"
 	"github.com/loneJogger/go-dungeon-crawler/internal/scene"
-	"github.com/loneJogger/go-dungeon-crawler/internal/scene/explore"
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
 )
@@ -43,7 +43,7 @@ type Location struct {
 	player       *entity.Player
 	npcs         []*entity.NPC
 	dialogBox    *ui.DialogBox
-	triggers     []explore.Trigger
+	triggers     []tilemap.Trigger
 	tileMap      *tiled.Map
 	tilesets     []*ebiten.Image
 	onTrigger    TriggerHandler
@@ -74,7 +74,7 @@ func NewLocation(
 		player:      p,
 		npcs:        npcs,
 		dialogBox:   ui.NewDialogBox(c.Assets.Font, c.Assets.DialogBorder),
-		triggers:    explore.LoadTriggers(tm),
+		triggers:    tilemap.LoadTriggers(tm),
 		tileMap:     tm,
 		tilesets:    tilesets,
 		onTrigger:   onTrigger,
@@ -184,7 +184,7 @@ func (s *Location) Update() error {
 		s.checkInteraction()
 	}
 
-	trigger := explore.CheckTrigger(s.triggers, s.player.X+8, s.player.Y+12)
+	trigger := tilemap.CheckTrigger(s.triggers, s.player.X+8, s.player.Y+12)
 	if trigger != nil {
 		for _, exit := range s.exits {
 			if trigger.Name == exit.TriggerName {
@@ -204,7 +204,7 @@ func (s *Location) Update() error {
 }
 
 func (s *Location) Draw(screen *ebiten.Image) {
-	explore.DrawMap(screen, s.tileMap, s.tilesets, s.cameraX, s.cameraY)
+	tilemap.DrawMap(screen, s.tileMap, s.tilesets, s.cameraX, s.cameraY)
 	for _, npc := range s.npcs {
 		npc.OffsetX, npc.OffsetY = s.cameraX, s.cameraY
 		npc.Draw(screen)

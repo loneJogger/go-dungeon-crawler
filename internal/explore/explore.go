@@ -8,6 +8,7 @@ import (
 
 	"github.com/loneJogger/go-dungeon-crawler/internal/config"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
+	"github.com/loneJogger/go-dungeon-crawler/internal/explore/room"
 	"github.com/loneJogger/go-dungeon-crawler/internal/transition"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
 )
@@ -27,13 +28,13 @@ type Explore struct {
 	menuState    menuState
 	menuWipe     *transition.WipeTransition
 	menuOverlay  *ebiten.Image
-	currentRoom  *Room
+	currentRoom  *room.Room
 	shuttingDown bool
 }
 
 func NewExplore(
 	ctx *ctx.GameContext,
-	r *Room,
+	r *room.Room,
 ) *Explore {
 	overlay := ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
 	overlay.Fill(color.Black)
