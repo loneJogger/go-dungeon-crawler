@@ -59,13 +59,21 @@ func playSound(p *audio.Player) {
 	p.Play()
 }
 
-type MenuStack struct {
-	stack       []*Menu
-	CancelSound *audio.Player
+type MenuSounds struct {
+	Nav    *audio.Player
+	Select *audio.Player
+	Cancel *audio.Player
 }
 
-func NewMenuStack(root *Menu) *MenuStack {
-	return &MenuStack{stack: []*Menu{root}}
+type MenuStack struct {
+	stack       []*Menu
+	cancelSound *audio.Player
+}
+
+func NewMenuStack(root *Menu, sounds MenuSounds) *MenuStack {
+	root.NavSound = sounds.Nav
+	root.SelectSound = sounds.Select
+	return &MenuStack{stack: []*Menu{root}, cancelSound: sounds.Cancel}
 }
 
 func (ms *MenuStack) Push(menu *Menu) {
@@ -75,12 +83,8 @@ func (ms *MenuStack) Push(menu *Menu) {
 func (ms *MenuStack) Pop() {
 	if len(ms.stack) > 1 {
 		ms.stack = ms.stack[:len(ms.stack)-1]
-		playSound(ms.CancelSound)
+		playSound(ms.cancelSound)
 	}
-}
-
-func NewMenuStackWithSounds(root *Menu, cancelSound *audio.Player) *MenuStack {
-	return &MenuStack{stack: []*Menu{root}, CancelSound: cancelSound}
 }
 
 func (ms *MenuStack) Active() *Menu {

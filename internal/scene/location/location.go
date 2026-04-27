@@ -93,9 +93,11 @@ func NewLocation(
 			l.shuttingDown = true
 		}},
 	})
-	root.NavSound = c.Assets.MenuNav
-	root.SelectSound = c.Assets.MenuSelect
-	l.systemMenu = ui.NewMenuStackWithSounds(root, c.Assets.MenuCancel)
+	l.systemMenu = ui.NewMenuStack(root, ui.MenuSounds{
+		Nav:    c.Assets.MenuNav,
+		Select: c.Assets.MenuSelect,
+		Cancel: c.Assets.MenuCancel,
+	})
 
 	l.updateCamera()
 	return l
