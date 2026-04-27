@@ -20,6 +20,12 @@ type MenuItem struct {
 	OnSelect func()
 }
 
+type MenuSounds struct {
+	Nav    *audio.Player
+	Select *audio.Player
+	Cancel *audio.Player
+}
+
 func NewMenu(items []MenuItem) *Menu {
 	return &Menu{Items: items}
 }
@@ -36,6 +42,14 @@ func (m *Menu) Select() { m.Items[m.focused].OnSelect() }
 
 func (m *Menu) Focused() int { return m.focused }
 
+func playSound(p *audio.Player) {
+	if p == nil {
+		return
+	}
+	p.Rewind()
+	p.Play()
+}
+
 func (m *Menu) Update() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
 		m.MoveUp()
@@ -49,62 +63,6 @@ func (m *Menu) Update() {
 		m.Select()
 		playSound(m.SelectSound)
 	}
-}
-
-func playSound(p *audio.Player) {
-	if p == nil {
-		return
-	}
-	p.Rewind()
-	p.Play()
-}
-
-type MenuSounds struct {
-	Nav    *audio.Player
-	Select *audio.Player
-	Cancel *audio.Player
-}
-
-type MenuStack struct {
-	stack       []*Menu
-	cancelSound *audio.Player
-}
-
-func NewMenuStack(root *Menu, sounds MenuSounds) *MenuStack {
-	root.NavSound = sounds.Nav
-	root.SelectSound = sounds.Select
-	return &MenuStack{stack: []*Menu{root}, cancelSound: sounds.Cancel}
-}
-
-func (ms *MenuStack) Push(menu *Menu) {
-	ms.stack = append(ms.stack, menu)
-}
-
-func (ms *MenuStack) Pop() {
-	if len(ms.stack) > 1 {
-		ms.stack = ms.stack[:len(ms.stack)-1]
-		playSound(ms.cancelSound)
-	}
-}
-
-func (ms *MenuStack) Active() *Menu {
-	return ms.stack[len(ms.stack)-1]
-}
-
-func (ms *MenuStack) Stack() []*Menu {
-	return ms.stack
-}
-
-func (ms *MenuStack) Update() {
-	if inpututil.IsKeyJustPressed(ebiten.KeyX) {
-		ms.Pop()
-		return
-	}
-	ms.Active().Update()
-}
-
-func (ms *MenuStack) Draw(screen *ebiten.Image, font *ebiten.Image, x, y int) {
-	ms.Active().Draw(screen, font, x, y)
 }
 
 func (m *Menu) Draw(screen *ebiten.Image, font *ebiten.Image, x, y int) {
