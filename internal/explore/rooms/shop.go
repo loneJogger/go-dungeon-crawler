@@ -4,7 +4,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
-	"github.com/loneJogger/go-dungeon-crawler/internal/config"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
 	"github.com/loneJogger/go-dungeon-crawler/internal/explore/room"
@@ -32,18 +31,16 @@ func NewShopRoom(c *ctx.GameContext, switchRoom SwitchFn, westExitX, westExitY, 
 
 	weaponMerchant.OnInteract = func() {
 		r.ShowDialog(
-			"Come see me once someone invents money.",
+			"Come see me once someone invents {COLOR MINT}money{COLOR DEFAULT}.",
 			nil,
-			config.IcyBlueText,
 			c.Assets.VoiceOne,
 		)
 	}
 
 	itemMerchant.OnInteract = func() {
 		r.ShowDialog(
-			"Come see me once someone invents money.",
+			"Come see me once someone invents {COLOR MINT}money{COLOR DEFAULT}.",
 			nil,
-			config.IcyBlueText,
 			c.Assets.VoiceOne,
 		)
 	}
