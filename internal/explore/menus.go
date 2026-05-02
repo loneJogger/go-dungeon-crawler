@@ -1,4 +1,4 @@
-package location
+package explore
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
 )
 
-func buildCharacterListMenu(c *ctx.GameContext, stack *ui.MenuStack) *ui.Menu {
+func BuildCharacterListMenu(c *ctx.GameContext, stack *ui.MenuStack) *ui.Menu {
 	items := make([]ui.MenuItem, len(c.Party.Members))
 	for i, member := range c.Party.Members {
 		m := member
