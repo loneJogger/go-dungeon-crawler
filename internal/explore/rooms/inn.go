@@ -4,7 +4,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/loneJogger/go-dungeon-crawler/internal/assets"
-	"github.com/loneJogger/go-dungeon-crawler/internal/config"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
 	"github.com/loneJogger/go-dungeon-crawler/internal/entity"
 	"github.com/loneJogger/go-dungeon-crawler/internal/explore/room"
@@ -24,7 +23,7 @@ func NewInnRoom(c *ctx.GameContext, switchRoom SwitchFn, returnX, returnY float6
 
 	devil.OnInteract = func() {
 		r.ShowDialog(
-			"Hehehehehehehe",
+			"{COLOR BLOODY}Hehehehehehehe",
 			func() {
 				c.Assets.TownBGM.Pause()
 				c.Assets.BattleStart.Rewind()
@@ -33,7 +32,6 @@ func NewInnRoom(c *ctx.GameContext, switchRoom SwitchFn, returnX, returnY float6
 				c.Assets.BattleBGM.Play()
 				c.ScSwitcher.SetScene(battle.New())
 			},
-			config.BloodyText,
 			c.Assets.VoiceTwo,
 		)
 	}

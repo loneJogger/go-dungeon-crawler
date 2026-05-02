@@ -47,8 +47,8 @@ func New(
 	}
 }
 
-func (r *Room) ShowDialog(text string, onComplete func(), color []float32, beep *audio.Player) {
-	r.dialogBox.ShowText(text, onComplete, color, beep)
+func (r *Room) ShowDialog(text string, onComplete func(), beep *audio.Player) {
+	r.dialogBox.ShowText(text, onComplete, beep)
 }
 
 func (r *Room) SetPlayerPos(x, y float64) {

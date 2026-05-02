@@ -26,8 +26,7 @@ go run ./cmd/main.go
 
 ### UI
 
-- update string parsing to handle color syntax
-- move text colors, improve palette
+- improve and expand text color palette
 - main menu layout
 - implement items menu
 
@@ -36,9 +35,11 @@ go run ./cmd/main.go
 - Inventory, Money, State?
 
 ### Explore
-- Expand interactions (give items, ask questions)
+
+- Expand interactions (NPCs give items, NPCs ask questions)
 
 ### Battle
+
 - ATB system
 - Tagerting UI
 - Add Actions to characters
@@ -47,5 +48,5 @@ go run ./cmd/main.go
 - Enemy behavior
 
 ### Game
+
 - Saving
-- refactor Audio handling

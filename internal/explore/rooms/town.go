@@ -28,18 +28,16 @@ func NewTownRoom(c *ctx.GameContext, switchRoom SwitchFn) *room.Room {
 
 	thief.OnInteract = func() {
 		r.ShowDialog(
-			"Hey You!\n\nThere are some strange characters at the inn...\n\nuh...\nMaybe go do something about it?",
+			"Hey You!\n\nThere are some {COLOR PINK}strange characters{COLOR DEFAULT} at the inn...\n\nuh...\nMaybe go do something about it?",
 			nil,
-			config.PinkText,
 			c.Assets.VoiceOne,
 		)
 	}
 
 	blackBelt.OnInteract = func() {
 		r.ShowDialog(
-			"... ... ... ... ... ... ... ...\n\nIf I was a sea gull, I would fly as far as I could!\n\nI would fly to far away places and sing for many people!\n\n",
+			"... ... ... ... ... ... ... ...\n\nIf I was a {COLOR ICY_BLUE}sea gull{COLOR DEFAULT}, I would {COLOR MINT}fly{COLOR DEFAULT} as far as I could!\n\nI would fly to {COLOR PINK}far away places{COLOR DEFAULT} and {COLOR BLOODY}sing{COLOR DEFAULT} for many people!\n\n",
 			nil,
-			config.MintText,
 			c.Assets.VoiceTwo,
 		)
 	}
