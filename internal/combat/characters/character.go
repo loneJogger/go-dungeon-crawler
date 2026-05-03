@@ -1,7 +1,7 @@
 package characters
 
 import (
-	"github.com/loneJogger/go-dungeon-crawler/internal/combat/items"
+	"github.com/loneJogger/go-dungeon-crawler/internal/combat/item"
 )
 
 const StatCap = 100
@@ -14,7 +14,7 @@ type Character struct {
 	TotalMP, CurrentMP                                                        int
 	Strength, Defense, Intelligence, Spirit, Dexterity, Accuracy, Speed, Luck int
 	Actions                                                                   []*Action
-	Equipment                                                                 []*items.Equipement
+	Equipment                                                                 []*item.Equipement
 	StatusEffects                                                             []*StatusEffect
 	Spells                                                                    []*Spell
 	Resistences                                                               Resistences

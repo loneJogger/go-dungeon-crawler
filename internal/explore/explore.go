@@ -51,12 +51,12 @@ func New(c *ctx.GameContext) *Explore {
 	}
 
 	rootMenu := ui.NewMenu([]ui.MenuItem{
-		{Label: "Characters", OnSelect: func() {
+		{Label: "Status", OnSelect: func() {
 			e.systemMenu.Push(BuildCharacterListMenu(c, e.systemMenu))
 		}},
 		{Label: "Items", OnSelect: func() {}},
 		{Label: "Save", OnSelect: func() {}},
-		{Label: "Exit Game", OnSelect: func() {
+		{Label: "Exit", OnSelect: func() {
 			c.Assets.TownBGM.Pause()
 			c.Assets.GameStart.Rewind()
 			c.Assets.GameStart.Play()
