@@ -3,13 +3,11 @@ package combat
 import (
 	"math"
 	"math/rand"
-
-	"github.com/loneJogger/go-dungeon-crawler/internal/combat/characters"
 )
 
 func GetPhysicalDamage(
-	attacker characters.Character,
-	defender characters.Character,
+	attacker Character,
+	defender Character,
 ) int {
 	if isCrit(attacker) {
 		return int(math.Pow(float64(attacker.Strength), 2) / float64(attacker.Strength-defender.Defense) * 2)
@@ -22,9 +20,9 @@ func GetPhysicalDamage(
 }
 
 func GetMagicalDamage(
-	attacker characters.Character,
-	defender characters.Character,
-	element characters.Element,
+	attacker Character,
+	defender Character,
+	element Element,
 ) int {
 	variance := 0.9 + rand.Float64()*0.2
 	return max(
@@ -37,20 +35,20 @@ func GetMagicalDamage(
 	)
 }
 
-func GetHealingAmount(caster characters.Character) int {
+func GetHealingAmount(caster Character) int {
 	variance := 0.9 + rand.Float64()*0.2
 	return int(float64(caster.Intelligence) * variance * 1.5)
 }
 
 func isDodged(
-	attacker characters.Character,
-	defender characters.Character,
+	attacker Character,
+	defender Character,
 ) bool {
 	return rand.Intn(100) > (60 + attacker.Accuracy - defender.Dexterity)
 }
 
 func isCrit(
-	attacker characters.Character,
+	attacker Character,
 ) bool {
-	return rand.Intn(characters.StatCap) > (characters.StatCap - attacker.Luck)
+	return rand.Intn(StatCap) > (StatCap - attacker.Luck)
 }

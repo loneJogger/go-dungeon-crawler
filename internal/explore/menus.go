@@ -3,7 +3,7 @@ package explore
 import (
 	"fmt"
 
-	"github.com/loneJogger/go-dungeon-crawler/internal/combat/characters"
+	"github.com/loneJogger/go-dungeon-crawler/internal/combat"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ctx"
 	"github.com/loneJogger/go-dungeon-crawler/internal/ui"
 )
@@ -25,7 +25,7 @@ func BuildCharacterListMenu(c *ctx.GameContext, stack *ui.MenuStack) *ui.Menu {
 	return menu
 }
 
-func buildCharacterStatsMenu(char *characters.Character) *ui.Menu {
+func buildCharacterStatsMenu(char *combat.Character) *ui.Menu {
 	noop := func() {}
 	items := []ui.MenuItem{
 		{Label: char.Name, OnSelect: noop},

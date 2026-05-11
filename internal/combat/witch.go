@@ -1,8 +1,4 @@
-package characters
-
-import (
-	"github.com/loneJogger/go-dungeon-crawler/internal/combat/item"
-)
+package combat
 
 type Witch struct {
 	Character
@@ -26,7 +22,7 @@ func NewWitch() *Witch {
 			Accuracy:      20,
 			Luck:          18,
 			Actions:       []*Action{},
-			Equipment:     []*item.Equipement{},
+			Equipment:     []*Equipement{},
 			StatusEffects: []*StatusEffect{},
 			Spells:        []*Spell{},
 			Resistences: Resistences{

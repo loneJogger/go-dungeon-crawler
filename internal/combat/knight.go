@@ -1,15 +1,10 @@
-package characters
-
-import (
-	"github.com/loneJogger/go-dungeon-crawler/internal/combat/item"
-)
+package combat
 
 type Knight struct {
 	Character
 }
 
 func NewKnight() *Knight {
-
 	return &Knight{
 		Character: Character{
 			Name:          "Maren",
@@ -27,7 +22,7 @@ func NewKnight() *Knight {
 			Accuracy:      25,
 			Luck:          15,
 			Actions:       []*Action{},
-			Equipment:     []*item.Equipement{},
+			Equipment:     []*Equipement{},
 			StatusEffects: []*StatusEffect{},
 			Spells:        []*Spell{},
 			Resistences: Resistences{
