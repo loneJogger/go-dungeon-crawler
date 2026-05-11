@@ -25,6 +25,17 @@ const (
 	menuWipingOut
 )
 
+const (
+	navWidth     = 112
+	contentX     = navWidth
+	contentWidth = config.ScreenWidth - navWidth
+	// 8px border tile + 8px dialog padding
+	navTextX     = 16
+	navTextY     = 16
+	contentTextX = contentX + 16
+	contentTextY = 16
+)
+
 type Explore struct {
 	ctx          *ctx.GameContext
 	shuttingDown bool
@@ -51,18 +62,21 @@ func New(c *ctx.GameContext) *Explore {
 	}
 
 	rootMenu := ui.NewMenu([]ui.MenuItem{
-		{Label: "Status", OnSelect: func() {
-			e.systemMenu.Push(BuildCharacterListMenu(c, e.systemMenu))
+		{Label: "CHAR", OnSelect: func() {
+			e.systemMenu.Push(BuildCharacterOverviewMenu(c, e.systemMenu))
 		}},
-		{Label: "Items", OnSelect: func() {}},
-		{Label: "Save", OnSelect: func() {}},
-		{Label: "Exit", OnSelect: func() {
+		{Label: "ITEM", OnSelect: func() {}},
+		{Label: "GEAR", OnSelect: func() {}},
+		{Label: "SAVE", OnSelect: func() {}},
+		{Label: "EXIT", OnSelect: func() {
 			c.Assets.TownBGM.Pause()
 			c.Assets.GameStart.Rewind()
 			c.Assets.GameStart.Play()
 			e.shuttingDown = true
 		}},
 	})
+
+	rootMenu.ItemGap = 8
 	e.systemMenu = ui.NewMenuStack(rootMenu, ui.MenuSounds{
 		Nav:    c.Assets.MenuNav,
 		Select: c.Assets.MenuSelect,
@@ -179,7 +193,13 @@ func (e *Explore) Draw(screen *ebiten.Image) {
 		e.menuWipe.Draw(screen)
 	case menuOpen:
 		screen.DrawImage(e.menuOverlay, nil)
-		e.systemMenu.Draw(screen, e.ctx.Assets.Font, 32, 32)
+		ui.DrawDialogBox(screen, e.ctx.Assets.DialogBorder, 0, 0, navWidth, config.ScreenHeight)
+		e.systemMenu.Stack()[0].Draw(screen, e.ctx.Assets.Font, navTextX, navTextY)
+		if len(e.systemMenu.Stack()) == 1 {
+			drawHoverContent(screen, e.ctx, contentTextX, contentTextY, e.systemMenu.Stack()[0].Focused())
+		} else {
+			e.systemMenu.Active().Draw(screen, e.ctx.Assets.Font, contentTextX, contentTextY)
+		}
 	}
 
 	if e.roomTransition != nil {

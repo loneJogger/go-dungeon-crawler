@@ -11,6 +11,9 @@ import (
 type Menu struct {
 	Items       []MenuItem
 	focused     int
+	blinkTick   int
+	Static      bool
+	ItemGap     int
 	NavSound    *audio.Player
 	SelectSound *audio.Player
 }
@@ -18,6 +21,8 @@ type Menu struct {
 type MenuItem struct {
 	Label    string
 	OnSelect func()
+	HeightPx int // 0 falls back to DialogLineHeight
+	DrawItem func(screen *ebiten.Image, font *ebiten.Image, x, y int, focused, cursorOn bool)
 }
 
 type MenuSounds struct {
@@ -32,10 +37,12 @@ func NewMenu(items []MenuItem) *Menu {
 
 func (m *Menu) MoveUp() {
 	m.focused = (m.focused - 1 + len(m.Items)) % len(m.Items)
+	m.blinkTick = 0
 }
 
 func (m *Menu) MoveDown() {
 	m.focused = (m.focused + 1) % len(m.Items)
+	m.blinkTick = 0
 }
 
 func (m *Menu) Select() { m.Items[m.focused].OnSelect() }
@@ -51,13 +58,16 @@ func playSound(p *audio.Player) {
 }
 
 func (m *Menu) Update() {
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-		m.MoveUp()
-		playSound(m.NavSound)
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
-		m.MoveDown()
-		playSound(m.NavSound)
+	m.blinkTick++
+	if !m.Static {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+			m.MoveUp()
+			playSound(m.NavSound)
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+			m.MoveDown()
+			playSound(m.NavSound)
+		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
 		m.Select()
@@ -66,21 +76,35 @@ func (m *Menu) Update() {
 }
 
 func (m *Menu) Draw(screen *ebiten.Image, font *ebiten.Image, x, y int) {
+	cursorOn := (m.blinkTick/30)%2 == 0
+	rowY := y
 	for i, item := range m.Items {
-		label := "  " + item.Label
-		if i == m.focused {
-			label = "> " + item.Label
+		if item.DrawItem != nil {
+			item.DrawItem(screen, font, x, rowY, i == m.focused, cursorOn)
+		} else {
+			cursor := " "
+			if i == m.focused && cursorOn {
+				cursor = ">"
+			}
+			DrawText(screen, font, cursor+item.Label, x, rowY)
 		}
-		col := 0
-		for _, ch := range label {
-			charIndex := int(ch) - 32
-			sx := (charIndex % charsPerRow) * charSize
-			sy := (charIndex / charsPerRow) * charSize
-			src := font.SubImage(image.Rect(sx, sy, sx+charSize, sy+charSize)).(*ebiten.Image)
-			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(x+col*charSize), float64(y+i*DialogLineHeight))
-			screen.DrawImage(src, op)
-			col++
+		h := DialogLineHeight
+		if item.HeightPx > 0 {
+			h = item.HeightPx
 		}
+		rowY += h + m.ItemGap
+	}
+}
+
+// DrawText renders a plain ASCII string at (x, y) using the sprite font.
+func DrawText(screen *ebiten.Image, font *ebiten.Image, text string, x, y int) {
+	for col, ch := range text {
+		charIndex := int(ch) - 32
+		sx := (charIndex % charsPerRow) * charSize
+		sy := (charIndex / charsPerRow) * charSize
+		src := font.SubImage(image.Rect(sx, sy, sx+charSize, sy+charSize)).(*ebiten.Image)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(x+col*charSize), float64(y))
+		screen.DrawImage(src, op)
 	}
 }
