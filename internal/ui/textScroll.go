@@ -31,6 +31,7 @@ type TextScroll struct {
 	pageIndex   int
 	charIndex   int
 	timer       int
+	blinkTick   int
 	waitingNext bool
 	done        bool
 	OnComplete  func()
@@ -50,10 +51,12 @@ func (t *TextScroll) Update() {
 	}
 
 	if t.waitingNext {
+		t.blinkTick++
 		if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
 			if t.pageIndex < len(t.pages)-1 {
 				t.pageIndex++
 				t.charIndex = 0
+				t.blinkTick = 0
 				t.waitingNext = false
 			} else {
 				t.done = true
@@ -122,8 +125,10 @@ func (t *TextScroll) Draw(screen *ebiten.Image, font *ebiten.Image, boxX, boxY i
 		}
 	}
 
-	if t.waitingNext {
-		// TODO: draw "press Z" prompt indicator
+	if t.waitingNext && (t.blinkTick/30)%2 == 0 {
+		indicatorX := boxX + DialogBoxWidth - DialogPadding - charSize
+		indicatorY := boxY + DialogBoxHeight - DialogPadding - charSize
+		DrawText(screen, font, string(rune(127)), indicatorX, indicatorY)
 	}
 }
 

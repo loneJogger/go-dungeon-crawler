@@ -36,8 +36,10 @@ func NewTownRoom(c *ctx.GameContext, switchRoom SwitchFn) *room.Room {
 
 	blackBelt.OnInteract = func() {
 		r.ShowDialog(
-			"... ... ... ... ... ... ... ...\n\nIf I was a {COLOR ICY_BLUE}sea gull{COLOR DEFAULT}, I would {COLOR MINT}fly{COLOR DEFAULT} as far as I could!\n\nI would fly to {COLOR PINK}far away places{COLOR DEFAULT} and {COLOR BLOODY}sing{COLOR DEFAULT} for many people!\n\n",
-			nil,
+			"... ... ... ... ... ... ... ...\n\nIf I was a {COLOR ICY_BLUE}sea gull{COLOR DEFAULT}, I would {COLOR MINT}fly{COLOR DEFAULT} as far as I could!\n\nI would fly to {COLOR PINK}far away places{COLOR DEFAULT} and {COLOR BLOODY}sing{COLOR DEFAULT} for many people!\n\n... ... ... ... ... ... ... ...\n\nThank you for listening to an old woman talk,\n\nhere is some money for your adventure!",
+			func() {
+				c.Party.Gold = c.Party.Gold + 1000
+			},
 			c.Assets.VoiceTwo,
 		)
 	}
