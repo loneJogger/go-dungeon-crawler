@@ -27,6 +27,7 @@ type Assets struct {
 	NPCDevil     *ebiten.Image
 	Font         *ebiten.Image
 	DialogBorder *ebiten.Image
+	TitleGraphic *ebiten.Image
 
 	// tilesets
 	TownMap     *tiled.Map
@@ -83,6 +84,7 @@ func LoadAssets() (*Assets, error) {
 		{&a.NPCThief, "assets/sprites/thief.png"},
 		{&a.NPCBlackBelt, "assets/sprites/black_belt.png"},
 		{&a.NPCDevil, "assets/sprites/devil.png"},
+		{&a.TitleGraphic, "assets/ui/title_graphic.png"},
 	}
 	for _, e := range images {
 		img, err := LoadImage(e.path)
