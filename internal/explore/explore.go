@@ -26,9 +26,8 @@ const (
 )
 
 const (
-	navWidth     = 112
-	contentX     = navWidth
-	contentWidth = config.ScreenWidth - navWidth
+	navWidth = 112
+	contentX = navWidth
 	// 8px border tile + 8px dialog padding
 	navTextX     = 16
 	navTextY     = 16
@@ -67,6 +66,7 @@ func New(c *ctx.GameContext) *Explore {
 		}},
 		{Label: "ITEM", OnSelect: func() {}},
 		{Label: "GEAR", OnSelect: func() {}},
+		{Label: "SORT", OnSelect: func() {}},
 		{Label: "SAVE", OnSelect: func() {}},
 		{Label: "EXIT", OnSelect: func() {
 			c.Assets.TownBGM.Pause()

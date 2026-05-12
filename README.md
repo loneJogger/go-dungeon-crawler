@@ -27,12 +27,14 @@ go run ./cmd/main.go
 ### UI
 
 - improve and expand text color palette
-- main menu layout
 - implement items menu
+- implment equipment menu
+- implement save menu
 
 ### Management
 
 - Inventory, Money, State?
+- Save and Continue functionality
 
 ### Explore
 

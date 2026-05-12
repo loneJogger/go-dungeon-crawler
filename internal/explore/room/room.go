@@ -121,7 +121,7 @@ func (r *Room) checkInteraction() {
 	case 0:
 		checkY += config.TileSize
 	case 2:
-		checkY -= config.TileSize
+		checkY -= float64(config.TileSize) / 2
 	case 1:
 		if r.player.FacingRight {
 			checkX += config.TileSize

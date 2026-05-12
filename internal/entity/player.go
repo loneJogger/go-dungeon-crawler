@@ -73,7 +73,7 @@ func (p *Player) Update(m *tiled.Map, npcs []*NPC) {
 
 
 func npcCollides(x, y float64, npcs []*NPC) bool {
-	bounds := image.Rect(int(x), int(y), int(x)+tileSize, int(y)+tileSize)
+	bounds := image.Rect(int(x)+collideLeft, int(y)+collideTop, int(x)+collideRight, int(y)+collideBottom)
 	for _, npc := range npcs {
 		if bounds.Overlaps(npc.Bounds()) {
 			return true

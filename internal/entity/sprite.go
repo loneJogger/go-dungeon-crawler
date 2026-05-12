@@ -73,6 +73,9 @@ func (s *Sprite) IsSolidAt(m *tiled.Map, nx, ny float64) bool {
 }
 
 func (s *Sprite) Draw(screen *ebiten.Image) {
+	if s.Image == nil {
+		return
+	}
 	sx := s.Frame * tileSize
 	sy := s.Direction * tileSize
 
